@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model admins {
+  id    String     @id @default(cuid())
+  email String  @unique
+  name  String
+  password String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Classes model
+model Classes {
+  id        String   @id @default(cuid())
+  className String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Define relation to Students
+  students      students[]      @relation(name: "ClassStudents")
+
+  // Define relation to class sections
+  ClassSections ClassSections[]
+}
+
+// ClassSections model
+model ClassSections {
+  id          String   @id @default(cuid())
+  sectionName String
+  classId     String
+  teacherId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Define relation to Classes
+  class Classes @relation(fields: [classId], references: [id])
+
+  // Define relation to Teachers
+  teacher Teachers? @relation(fields: [teacherId], references: [id])
+
+  // Define relation to Students
+  students         students[]
+}
+
+model students {
+  id    Int     @id @default(autoincrement())
+  studentId String  @unique
+  fName String
+  lName  String
+   classId         String
+  classSectionsId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Define relation to Classes
+  class   Classes  @relation(fields: [classId], references: [id], name: "ClassStudents")
+   ClassSections     ClassSections      @relation(fields: [classSectionsId], references: [id])
+}
+
+// Teachers model
+model Teachers {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Define relation to ClassSections
+  classSections    ClassSections[]
+}
