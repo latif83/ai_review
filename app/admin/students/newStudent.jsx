@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 export const NewStudent = ({ setAddStudent }) => {
@@ -12,6 +12,63 @@ export const NewStudent = ({ setAddStudent }) => {
     })
 
     const [loading, setLoading] = useState(false)
+
+    const [classes, setClasses] = useState([])
+    const [classesLoading, setClassesLoading] = useState(false)
+
+    const [classSections, setClassSections] = useState([])
+    const [classSectionsLoading, setClassSectionsLoading] = useState(false)
+
+    useEffect(() => {
+        const getClasses = async () => {
+            setClassesLoading(true)
+            try {
+                const response = await fetch(`/api/classes`)
+
+                if (!response.ok) {
+                    // Error here
+                    return
+                }
+
+                const responseData = await response.json()
+
+                setClasses(responseData.classes)
+
+
+
+            } catch (e) {
+                console.log(e)
+            } finally {
+                setClassesLoading(false)
+            }
+        }
+
+        const getClassSections = async () => {
+            setClassSectionsLoading(true)
+            try {
+                const response = await fetch(`/api/classes/sections`)
+
+                if (!response.ok) {
+                    // Error here
+                    return
+                }
+
+                const responseData = await response.json()
+
+                setClassSections(responseData.classSections)
+
+
+
+            } catch (e) {
+                console.log(e)
+            } finally {
+                setClassSectionsLoading(false)
+            }
+        }
+
+        getClasses()
+        getClassSections()
+    }, [])
 
     const submitStudentData = async () => {
         setLoading(true)
@@ -76,24 +133,18 @@ export const NewStudent = ({ setAddStudent }) => {
                         <h1 className="text-sm font-bold text-gray-600">Assign to Class</h1>
                         <div className="grid grid-cols-2 gap-4 mt-5">
                             <div>
-                                <label for="class" class="block mb-2 text-sm font-medium text-gray-900">Select a class for student</label>
+                                <label htmlFor="class" class="block mb-2 text-sm font-medium text-gray-900">Select a class for student</label>
                                 <select id="class" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classId: e.target.value }))}>
                                     <option selected>Choose a class</option>
-                                    <option value="US">Primary 1</option>
-                                    <option value="CA">Primary 2</option>
-                                    <option value="FR">Primary 3</option>
-                                    <option value="DE">Primary 4</option>
+                                    {classes.map((clas) => (<option value={clas.id}>{clas.className}</option>))}
                                 </select>
                             </div>
 
                             <div>
-                                <label for="class" class="block mb-2 text-sm font-medium text-gray-900">Select a class Session</label>
+                                <label htmlFor="class" class="block mb-2 text-sm font-medium text-gray-900">Select a class Session</label>
                                 <select id="class" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
                                     <option selected>Choose a class section</option>
-                                    <option value="US">A</option>
-                                    <option value="CA">B</option>
-                                    <option value="FR">C</option>
-                                    <option value="DE">D</option>
+                                    {classSections.map((section) => (<option value={section.id}>{section.sectionName}</option>))}
                                 </select>
                             </div>
                         </div>

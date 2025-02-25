@@ -11,3 +11,9 @@ Content-Type: application/json
 
 ###
 http://localhost:3000/api/students
+
+###
+http://localhost:3000/api/classes
+
+###
+http://localhost:3000/api/classes/sections
