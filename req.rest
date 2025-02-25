@@ -2,9 +2,12 @@ POST http://localhost:3000/api/students
 Content-Type: application/json
 
 {
-     "studentId" : "928ikis",
+     "studentId" : "928iks",
         "fName" : "Abdul-Latif",
         "lName" : "Mohammed",
         "classId" : "cm7kra6id00008uq38x7uhzmp",
-        "classSectionsId" : "cm7krbcfe00028uq3t9fnv9d"
+        "classSectionsId" : "cm7krbcfe00028uq3t9fnv9d6"
 }
+
+###
+http://localhost:3000/api/students
