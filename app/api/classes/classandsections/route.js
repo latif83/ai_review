@@ -7,42 +7,6 @@ import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req) {
-  try {
-    // Parse request body for class data
-    const { className } =
-      await req.json();
-
-    // Check if required fields are provided
-    if (!className) {
-      return NextResponse.json(
-        {
-          message: "Missing required fields!",
-        },
-        { status: 400 }
-      );
-    }
-
-    // Create the new class in the database
-    await prisma.Classes.create({
-      data: {
-        className
-      },
-    });
-
-    return NextResponse.json(
-      { message: "New class added successfully!" },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("Error adding class:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function GET(req) {
     try {
       // Parse query parameters
@@ -54,7 +18,12 @@ export async function GET(req) {
       const classes = await prisma.classes.findMany({
         select: {
           id: true,
-          className: true
+          className: true,
+          ClassSections: {
+            select: {
+              sectionName: true,
+            },
+          }
         },
       });
   

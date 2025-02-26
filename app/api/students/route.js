@@ -13,8 +13,6 @@ export async function POST(req) {
     const { studentId, fName, lName, classId, classSectionsId } =
       await req.json();
 
-    console.log({ studentId, fName, lName, classId, classSectionsId });
-
     // Check if required fields are provided
     if (!fName || !lName || !studentId || !classId || !classSectionsId) {
       return NextResponse.json(

@@ -1,6 +1,7 @@
 import { useState } from "react"
+import { toast } from "react-toastify"
 
-export const NewClass = ({ setAddClass }) => {
+export const NewClass = ({ setAddClass, setFetchData }) => {
 
     const [formData, setFormData] = useState({
         className: ""
@@ -13,7 +14,11 @@ export const NewClass = ({ setAddClass }) => {
         setLoading(true)
         try {
             const response = await fetch(`/api/classes`, {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData)
             })
 
             if (!response.ok) {
@@ -24,9 +29,12 @@ export const NewClass = ({ setAddClass }) => {
             const responseData = await response.json()
 
             toast.success(responseData.message)
+            setFetchData(true)
+            setAddClass(false)
 
         } catch (e) {
             console.log(e)
+            toast.error("Internal Server Error!")
         } finally {
             setLoading(false)
         }
@@ -34,7 +42,7 @@ export const NewClass = ({ setAddClass }) => {
 
     return (
         <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
-            <div className="max-w-4xl transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
+            <div className="max-w-2xl transition duration-1000 bg-white mx-auto rounded-xl p-3 py-6">
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium">
                         New Class
