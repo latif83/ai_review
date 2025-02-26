@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,15 @@ export default function RootLayout({ children }) {
       <body
         className={`${poppins.className} antialiased`}
       >
+        <ToastContainer
+          position="top-right"
+          newestOnTop={true}
+          pauseOnHover
+          theme="light"
+          autoClose={5000}
+          hideProgressBar={false}
+          stacked
+        />
         {children}
       </body>
     </html>

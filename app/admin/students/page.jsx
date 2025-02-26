@@ -9,6 +9,8 @@ export default function Students() {
     const [students, setStudents] = useState([])
     const [loadingStudents, setLoadingStudents] = useState(false)
 
+    const [fetchData,setFetchData] = useState(true)
+
     useEffect(() => {
         const fetchStudentsData = async () => {
             try {
@@ -30,13 +32,16 @@ export default function Students() {
             }
         }
 
+        if(fetchData){
         fetchStudentsData()
-    }, [])
+        setFetchData(false)
+        }
+    }, [fetchData])
 
     return (
         <div className="px-5 py-5">
 
-            {addStudent && <NewStudent setAddStudent={setAddStudent} />}
+            {addStudent && <NewStudent setAddStudent={setAddStudent} setFetchData={setFetchData} />}
 
 
             <div className="mb-5 flex justify-between items-center">
@@ -66,7 +71,7 @@ flex items-center gap-2">
                 <div className="relative">
                     <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                         <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                         </svg>
                     </div>
                     <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Search for students..." required />
@@ -95,7 +100,7 @@ flex items-center gap-2">
                         </tr>
                     </thead>
                     <tbody>
-                        {loadingStudents ? [1, 2, 3, 4, 5, 6, 7, 8].map(() => (<tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200 animate-pulse">
+                        {loadingStudents ? [1, 2, 3, 4, 5, 6, 7, 8].map((n,index) => (<tr key={index} className="odd:bg-white even:bg-gray-50 border-b border-gray-200 animate-pulse">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                 <span className="bg-gray-200 rounded-lg h-[30px] w-full block">
 
@@ -119,7 +124,7 @@ flex items-center gap-2">
 
                                 </span>
                             </td>
-                        </tr>)) : students.length > 0 ? students.map((student) => (<tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                        </tr>)) : students.length > 0 ? students.map((student,index) => (<tr key={index} className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                 {`${student.fName} ${student.lName}`}
                             </th>

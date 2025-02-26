@@ -13,6 +13,8 @@ export async function POST(req) {
     const { studentId, fName, lName, classId, classSectionsId } =
       await req.json();
 
+    console.log({ studentId, fName, lName, classId, classSectionsId });
+
     // Check if required fields are provided
     if (!fName || !lName || !studentId || !classId || !classSectionsId) {
       return NextResponse.json(
@@ -48,41 +50,44 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
-    try {
-      // Parse query parameters
+  try {
+    // Parse query parameters
     //   const { searchParams } = new URL(req.url);
     //   const classId = searchParams.get("classId");
     //   const classSectionsId = searchParams.get("classSectionsId");
-  
-      // Fetch students from the database
-      const students = await prisma.students.findMany({
-        select: {
-          id: true,
-          studentId: true,
-          fName: true,
-          lName: true,
-          classId: true,
-          classSectionsId: true,
-          class: {
-            select: {
-              className: true, // Fetch class name
-            },
-          },
-          ClassSections: {
-            select: {
-              sectionName: true, // Fetch class section name
-            },
+
+    // Fetch students from the database
+    const students = await prisma.students.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        studentId: true,
+        fName: true,
+        lName: true,
+        classId: true,
+        classSectionsId: true,
+        class: {
+          select: {
+            className: true, // Fetch class name
           },
         },
-      });
-  
-      // Return the list of students
-      return NextResponse.json({ students }, { status: 200 });
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      return NextResponse.json(
-        { error: "Internal Server Error" },
-        { status: 500 }
-      );
-    }
+        ClassSections: {
+          select: {
+            sectionName: true, // Fetch class section name
+          },
+        },
+      },
+    });
+
+    // Return the list of students
+    return NextResponse.json({ students }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
+}
