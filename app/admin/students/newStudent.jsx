@@ -159,15 +159,45 @@ export const NewStudent = ({ setAddStudent, setFetchData }) => {
                                 <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a className Session</label>
                                 <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
                                     <option>Choose a class section</option>
-                                    {filteredClassSections.length > 0 ? filteredClassSections.map((section,index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
+                                    {filteredClassSections.length > 0 ? filteredClassSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
                                 </select>
                             </div>
                         </div>
                     </div>
 
                     <div className="col-span-2 mt-8">
-                        <button type="submit" className="bg-indigo-600 hover:bg-indigo-900 transition duration-500 text-white p-3 rounded-lg w-full block">
-                            <span>Add Student</span>
+                        <button
+                            type="submit"
+                            className="bg-indigo-600 disabled:bg-indigo-300 hover:bg-indigo-900 transition duration-500 text-white p-3 rounded-lg w-full flex items-center justify-center gap-2"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <svg
+                                        className="size-5 animate-spin text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
+                                        ></path>
+                                    </svg>
+                                    Processing…
+                                </>
+                            ) : (
+                                <span>Add Student</span>
+                            )}
                         </button>
                     </div>
                 </form>
