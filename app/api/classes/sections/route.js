@@ -7,6 +7,43 @@ import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
+export async function POST(req) {
+  try {
+    // Parse request body for class data
+    const { classId,sectionName } =
+      await req.json();
+
+    // Check if required fields are provided
+    if (!sectionName || !classId) {
+      return NextResponse.json(
+        {
+          message: "Missing required fields!",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Create the new class in the database
+    await prisma.ClassSections.create({
+      data: {
+        classId,
+        sectionName
+      },
+    });
+
+    return NextResponse.json(
+      { message: "New section added successfully!" },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error adding class:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function GET(req) {
     try {
       // Parse query parameters

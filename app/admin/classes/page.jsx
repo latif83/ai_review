@@ -2,10 +2,13 @@
 import { useEffect, useState } from "react";
 import { NewClass } from "./newClass";
 import { toast } from "react-toastify";
+import { NewClassSection } from "./newClassSection";
 
 export default function Classes() {
 
     const [addClass, setAddClass] = useState(false)
+    const [addClassSection,setAddClassSection] = useState(false)
+    const [classData,setClassData] = useState()
 
     const [classes, setClasses] = useState([])
 
@@ -49,6 +52,7 @@ export default function Classes() {
         <div className="px-5 py-5">
 
             {addClass && <NewClass setAddClass={setAddClass} setFetchData={setFetchData} />}
+            {addClassSection && <NewClassSection setAddClassSection={setAddClassSection} classData={classData} setFetchData={setFetchData} />}
 
             <div className="mb-5 flex justify-between items-center">
                 <div className="
@@ -80,7 +84,13 @@ flex items-center gap-2">
 
                         <div className="border-b pb-2 flex justify-between">
                             <p className="text-sm font-medium">Sections</p>
-                            <button type="button" className="hover:text-indigo-600">
+                            <button onClick={()=>{
+                                setAddClassSection(true)
+                                setClassData({
+                                    className : clas.className,
+                                    classId : clas.id
+                                })
+                            }} type="button" className="hover:text-indigo-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
