@@ -1,12 +1,10 @@
-POST http://localhost:3000/api/students
+POST http://localhost:3000/api/teachers
 Content-Type: application/json
 
 {
-     "studentId" : "928iks",
-        "fName" : "Abdul-Latif",
-        "lName" : "Mohammed",
-        "classId" : "cm7kra6id00008uq38x7uhzmp",
-        "classSectionsId" : "cm7krbcfe00028uq3t9fnv9d6"
+        "firstName" : "Abdul-Latif",
+        "lastName" : "Mohammed",
+        "email" : "latifm8360@gmail.com"
 }
 
 ###
@@ -28,3 +26,6 @@ Content-Type: application/json
 
 ###
 http://localhost:3000/api/classes/classandsections
+
+###
+http://localhost:3000/api/teachers
