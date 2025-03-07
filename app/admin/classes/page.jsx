@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { NewClass } from "./newClass";
 import { toast } from "react-toastify";
 import { NewClassSection } from "./newClassSection";
+import { ClassSectionActions } from "./classSectionActions";
 
 export default function Classes() {
 
@@ -13,6 +14,9 @@ export default function Classes() {
     const [classes, setClasses] = useState([])
 
     const [classesLoading, setClassesLoading] = useState(false)
+
+    const [sectionActions,setSectionActions] = useState(false)
+    const [sectionData,setSectionData] = useState()
 
     const [fetchData,setFetchData] = useState(true)
 
@@ -53,6 +57,8 @@ export default function Classes() {
 
             {addClass && <NewClass setAddClass={setAddClass} setFetchData={setFetchData} />}
             {addClassSection && <NewClassSection setAddClassSection={setAddClassSection} classData={classData} setFetchData={setFetchData} />}
+
+            {sectionActions && <ClassSectionActions setSectionActions={setSectionActions} sectionData={sectionData} />}
 
             <div className="mb-5 flex justify-between items-center">
                 <div className="
@@ -99,7 +105,12 @@ flex items-center gap-2">
                         </div>
 
                         <div className="flex flex-wrap gap-2 mt-2 text-sm">
-                            {clas.ClassSections.length > 0 ? clas.ClassSections.map((section,index)=>(<span key={index} className="bg-indigo-700 text-white p-2 px-3.5 rounded-full">
+                            {clas.ClassSections.length > 0 ? clas.ClassSections.map((section,index)=>(<span key={index} onClick={()=>{setSectionActions(true); setSectionData({
+                                classId : clas.id,
+                                className : clas.className,
+                                sectionId : section.id,
+                                sectionName : section.sectionName
+                            })}} className="bg-indigo-700 text-white p-2 px-3.5 rounded-full cursor-pointer hover:bg-red-700 transition duration-500">
                                 {section.sectionName}
                             </span>)) : <span className="text-red-600">No Sections Added!</span>}
                         </div>

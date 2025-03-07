@@ -29,3 +29,12 @@ http://localhost:3000/api/classes/classandsections
 
 ###
 http://localhost:3000/api/teachers
+
+###
+PUT http://localhost:3000/api/classes/assignTeacher
+Content-Type: application/json
+
+{
+     "classSectionId" : "cm7krbcfe00028uq3t9fnv9d6",
+     "teacherId" : "cm7tb2iw2000411genl7mwtw5"
+}

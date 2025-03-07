@@ -21,6 +21,7 @@ export async function GET(req) {
           className: true,
           ClassSections: {
             select: {
+              id : true,
               sectionName: true,
             },
           }
