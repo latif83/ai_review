@@ -2,7 +2,7 @@ export default function TeachersDashboard () {
     return (
         <div>
             
-            <div className="py-8 px-12 text-gray-600 flex justify-between items-center">
+            <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
 <div>
 <h1 className="text-lg font-bold">
     Welcome to the,
