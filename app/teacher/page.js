@@ -8,6 +8,9 @@ export default function TeachersDashboard () {
     Welcome to the,
 </h1>
 <h2 className="text-2xl font-bold">Teacher's Dashboard</h2>
+<p className="bg-black p-2 rounded text-sm text-white text-center font-bold">
+Micheal Osei
+</p>
 </div>
 <div className="text-right">
     <button type="button" className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm">
