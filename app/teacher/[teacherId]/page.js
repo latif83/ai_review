@@ -9,7 +9,7 @@ export default function TeachersDashboard({ params }) {
 
   const [userIdentity, setUserIdentity] = useState("");
 
-  const { teacherId } = use(params)
+  const { teacherId } = use(params);
 
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +47,7 @@ export default function TeachersDashboard({ params }) {
       }
     };
 
-    getAssignedClassSections()
+    getAssignedClassSections();
   }, []);
 
   return (
@@ -56,7 +56,11 @@ export default function TeachersDashboard({ params }) {
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
           <h2 className="text-2xl font-bold">Teacher's Dashboard</h2>
-          <p className={`bg-black p-2 rounded text-sm text-white text-center font-bold ${!userIdentity && 'animate-pulse py-4'}`}>
+          <p
+            className={`bg-black p-2 rounded text-sm text-white text-center font-bold ${
+              !userIdentity && "animate-pulse py-4"
+            }`}
+          >
             {userIdentity}
           </p>
         </div>

@@ -1,26 +1,59 @@
-export default function ClassSection() {
-  const students = [
-    "James Anderson",
-    "Emily Johnson",
-    "Michael Smith",
-    "Sophia Brown",
-    "Daniel Martinez",
-    "Olivia Taylor",
-    "William Hernandez",
-    "Ava Moore",
-    "Alexander Wilson",
-    "Mia Garcia",
-    "Benjamin Thompson",
-    "Charlotte Lopez",
-    "Ethan Clark",
-    "Amelia Rodriguez",
-    "Matthew Lewis",
-    "Harper Lee",
-    "Jacob Walker",
-    "Ella Hall",
-    "Lucas Allen",
-    "Scarlett Young",
-  ];
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
+export default function ClassSection({ params }) {
+  const [students, setStudents] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const { classSectionId, teacherId } = use(params);
+
+  const [userIdentity, setUserIdentity] = useState("");
+
+  const router = useRouter();
+
+  const [className, setClassName] = useState("");
+
+  useEffect(() => {
+    if (!localStorage.getItem("identity")) {
+      toast.error("Please login to access this page!");
+      router.replace("/");
+      return;
+    }
+
+    setUserIdentity(localStorage.getItem("userIdentity"));
+
+    const getStudents = async () => {
+      try {
+        const response = await fetch(`/api/classes/sections/${classSectionId}`);
+        const responseData = await response.json();
+        if (!response.ok) {
+          toast.error(responseData.message);
+          return;
+        }
+
+        setClassName(
+          `${responseData.classSections.class.className} (${responseData.classSections.sectionName})`
+        );
+
+        localStorage.setItem(
+          "className",
+          `${responseData.classSections.class.className} (${responseData.classSections.sectionName})`
+        );
+
+        setStudents(responseData.classSections.students);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getStudents();
+  }, []);
 
   return (
     <div>
@@ -28,8 +61,12 @@ export default function ClassSection() {
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
           <h2 className="text-2xl font-bold">Teacher's Dashboard</h2>
-          <p className="bg-black p-2 rounded text-sm text-white text-center font-bold">
-            Micheal Osei
+          <p
+            className={`bg-black p-2 rounded text-sm text-white text-center font-bold ${
+              !userIdentity && "animate-pulse py-4"
+            }`}
+          >
+            {userIdentity}
           </p>
         </div>
         <div className="text-right">
@@ -63,6 +100,7 @@ export default function ClassSection() {
       <div className="px-12 pt-1">
         <div className="flex gap-2 items-center mb-2">
           <button
+            onClick={() => router.back()}
             type="button"
             className="bg-red-200 text-gray-900 hover:bg-red-700 hover:text-gray-50 transition duration-500 p-2 rounded-md"
           >
@@ -82,7 +120,7 @@ export default function ClassSection() {
             </svg>
           </button>
 
-          <p className="text-sm font-medium text-gray-400">Primary 1 (A) /</p>
+          <p className="text-sm font-medium text-gray-400">{className} /</p>
         </div>
 
         <h1 className="font-bold mb-2">List of students</h1>
@@ -128,100 +166,54 @@ export default function ClassSection() {
         </div>
 
         <div className="mt-8 flex flex-wrap grid-cols-3 gap-5">
-          {students.map((stud, index) => (
-            <div
-              key={index}
-              className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-              <span>{stud}</span>
-            </div>
-          ))}
-
-          <div className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-            <span>Micheal Essien</span>
-          </div>
-
-          <div className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-            <span>Abigail Effum</span>
-          </div>
-
-          <div className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-            <span>Anthony Osei</span>
-          </div>
-
-          <div className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-            <span>David Wilson</span>
-          </div>
+          {loading
+            ? [1, 2, 3, 4, 5, 6, 7, 8].map((num, index) => (
+                <div
+                  key={index}
+                  className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md animate-pulse"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                  <span className="bg-gray-200 w-[150px] h-[30px] rounded-md"></span>
+                </div>
+              ))
+            : students.map((stud, index) => (
+                <Link
+                  href={`/teacher/${teacherId}/${classSectionId}/comments/${stud.id}`}
+                  key={index}
+                  className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                  <span>
+                    {stud.fName} {stud.lName}
+                  </span>
+                </Link>
+              ))}
         </div>
       </div>
     </div>

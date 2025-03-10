@@ -1,41 +1,68 @@
-export default function StudentComment() {
- 
-    
-    const studentComments = [
-        {
-          student: "James Anderson",
-          academicYr: "2024/2025",
-          academicTerm: "Term 1",
-          comment: "James is highly engaged in Science and enjoys hands-on activities. However, he sometimes struggles with staying focused during theoretical lessons and needs to improve his attention to detail in written work.",
-          by: "Mr. Johnson",
-          approvedBy: "Mrs. Williams"
-        },
-        {
-          student: "James Anderson",
-          academicYr: "2024/2025",
-          academicTerm: "Term 2",
-          comment: "James is consistent with his assignments and has a great work ethic. However, he tends to rush through tasks, leading to avoidable mistakes. Encouraging him to review his work before submission would be beneficial.",
-          by: "Ms. Carter",
-          approvedBy: "Dr. Miller"
-        },
-        {
-          student: "James Anderson",
-          academicYr: "2024/2025",
-          academicTerm: "Term 3",
-          comment: "James collaborates well with peers and is always willing to help others. However, he sometimes hesitates to ask for help when he is struggling, particularly in Math. Building confidence in seeking clarification would improve his overall performance.",
-          by: "Mr. Davis",
-          approvedBy: "Mr. Thompson"
-        },
-        {
-          student: "James Anderson",
-          academicYr: "2024/2025",
-          academicTerm: "Term 4",
-          comment: "James has shown improvement in leadership skills and class participation. However, his time management could use some work, especially during group projects where he occasionally procrastinates. Encouraging better planning and organization will help him succeed.",
-          by: "Mrs. Brown",
-          approvedBy: "Mr. Lewis"
-        }
-      ];
-      
+"use client";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+
+export default function StudentComment({ params }) {
+  const router = useRouter();
+
+  const { studentId } = use(params);
+
+  const studentComments = [
+    {
+      student: "James Anderson",
+      academicYr: "2024/2025",
+      academicTerm: "Term 1",
+      comment:
+        "James is highly engaged in Science and enjoys hands-on activities. However, he sometimes struggles with staying focused during theoretical lessons and needs to improve his attention to detail in written work.",
+      by: "Mr. Johnson",
+      approvedBy: "Mrs. Williams",
+    },
+    {
+      student: "James Anderson",
+      academicYr: "2024/2025",
+      academicTerm: "Term 2",
+      comment:
+        "James is consistent with his assignments and has a great work ethic. However, he tends to rush through tasks, leading to avoidable mistakes. Encouraging him to review his work before submission would be beneficial.",
+      by: "Ms. Carter",
+      approvedBy: "Dr. Miller",
+    },
+    {
+      student: "James Anderson",
+      academicYr: "2024/2025",
+      academicTerm: "Term 3",
+      comment:
+        "James collaborates well with peers and is always willing to help others. However, he sometimes hesitates to ask for help when he is struggling, particularly in Math. Building confidence in seeking clarification would improve his overall performance.",
+      by: "Mr. Davis",
+      approvedBy: "Mr. Thompson",
+    },
+    {
+      student: "James Anderson",
+      academicYr: "2024/2025",
+      academicTerm: "Term 4",
+      comment:
+        "James has shown improvement in leadership skills and class participation. However, his time management could use some work, especially during group projects where he occasionally procrastinates. Encouraging better planning and organization will help him succeed.",
+      by: "Mrs. Brown",
+      approvedBy: "Mr. Lewis",
+    },
+  ];
+
+  const [className, setClassName] = useState("");
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setClassName(localStorage.getItem("className"));
+
+    const getStudentRecentComments = async () => {
+      try {
+        const response = await fetch(`/api/students/${studentId}/comments`);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -78,6 +105,7 @@ export default function StudentComment() {
       <div className="px-12 pt-2 pb-8">
         <div className="flex gap-2 items-center mb-2">
           <button
+            onClick={() => router.back()}
             type="button"
             className="bg-red-200 text-gray-900 hover:bg-red-700 hover:text-gray-50 transition duration-500 p-2 rounded-md"
           >
@@ -98,7 +126,7 @@ export default function StudentComment() {
           </button>
 
           <p className="text-sm text-gray-400 font-medium">
-            Primary 1 (A) / Emmanuel Asare
+            {className} / Emmanuel Asare
           </p>
         </div>
 
