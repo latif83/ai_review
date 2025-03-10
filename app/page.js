@@ -32,11 +32,17 @@ export default function Home() {
 
       if (!response.ok) {
         toast.error(responseData.message);
+        return
       }
+
+      localStorage.setItem("identity", responseData.identity);
+      localStorage.setItem("userIdentity", responseData.user);
+      localStorage.setItem("loggedInRole", responseData.roleIs);
 
       toast.success(responseData.message);
 
-      router.push(responseData.roleIs);
+      responseData.roleIs == "admin" ? router.push(responseData.roleIs) : router.push(`${responseData.roleIs}/${responseData.identity}`);
+      
     } catch (e) {
       console.log(e);
     } finally {

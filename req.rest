@@ -48,3 +48,6 @@ Content-Type: application/json
         "password" :"ronsard@123",
         "role" : "admin"
 }
+
+###
+http://localhost:3000/api/teachers/cm7vzroq0000511gelm2b0lfb/assignedClasses

@@ -93,7 +93,7 @@ export async function POST(req) {
     } else {
       // Invalid email or password
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { message: "Invalid email or password" },
         { status: 401 }
       );
     }
