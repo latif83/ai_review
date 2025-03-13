@@ -27,3 +27,33 @@ export async function GET(req,{params}) {
       );
     }
   }
+
+
+  export async function POST(req) {
+    try {
+      const body = await req.json();
+  
+      // Ensure body contains required fields
+      if (!body || !body.comments || !Array.isArray(body.comments)) {
+        return NextResponse.json(
+          { message: "Invalid request. 'comments' must be an array." },
+          { status: 400 }
+        );
+      }
+  
+      // Insert comments into the database
+      const createdComments = await prisma.Comments.createMany({
+        data: body.comments.map(comment => ({
+          studentId: comment.studentId,
+          academicYr: comment.academicYr,
+          academicTerm: comment.academicTerm,
+          comment: comment.comment
+        })),
+      });
+  
+      return NextResponse.json({ message : "Comments Uploaded Successfully!" }, { status: 201 });
+    } catch (error) {
+      console.error("Error inserting comments:", error);
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+  }

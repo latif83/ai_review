@@ -11,12 +11,12 @@ datasource db {
 }
 
 model admins {
-  id    String     @id @default(cuid())
-  email String  @unique
-  name  String
-  password String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Classes model
@@ -27,7 +27,7 @@ model Classes {
   updatedAt DateTime @updatedAt
 
   // Define relation to Students
-  students      students[]      @relation(name: "ClassStudents")
+  students students[] @relation(name: "ClassStudents")
 
   // Define relation to class sections
   ClassSections ClassSections[]
@@ -49,22 +49,23 @@ model ClassSections {
   teacher Teachers? @relation(fields: [teacherId], references: [id])
 
   // Define relation to Students
-  students         students[]
+  students students[]
 }
 
 model students {
-  id    Int     @id @default(autoincrement())
-  studentId String  @unique
-  fName String
-  lName  String
-   classId         String
+  id              Int      @id @default(autoincrement())
+  studentId       String   @unique
+  fName           String
+  lName           String
+  classId         String
   classSectionsId String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   // Define relation to Classes
-  class   Classes  @relation(fields: [classId], references: [id], name: "ClassStudents")
-   ClassSections     ClassSections      @relation(fields: [classSectionsId], references: [id])
+  class         Classes       @relation(fields: [classId], references: [id], name: "ClassStudents")
+  ClassSections ClassSections @relation(fields: [classSectionsId], references: [id])
+  Comments      Comments[]
 }
 
 // Teachers model
@@ -78,5 +79,18 @@ model Teachers {
   updatedAt DateTime @updatedAt
 
   // Define relation to ClassSections
-  classSections    ClassSections[]
+  classSections ClassSections[]
+}
+
+// Comments model
+model Comments {
+  id           String   @id @default(cuid())
+  studentId    String?
+  academicYr   String?
+  academicTerm String?
+  comment      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Students students? @relation(fields: [studentId], references: [studentId])
 }
