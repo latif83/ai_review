@@ -189,7 +189,7 @@ export default function ClassSection({ params }) {
                   <span className="bg-gray-200 w-[150px] h-[30px] rounded-md"></span>
                 </div>
               ))
-            : students.map((stud, index) => (
+            : students.length > 0 ? students.map((stud, index) => (
                 <Link
                   href={`/teacher/${teacherId}/${classSectionId}/comments/${stud.id}`}
                   key={index}
@@ -213,7 +213,7 @@ export default function ClassSection({ params }) {
                     {stud.fName} {stud.lName}
                   </span>
                 </Link>
-              ))}
+              )) : <div className="w-full text-center"> <p className="text-gray-600">No Students found.</p> <p className="text-sm">Please Contact your Administrator if there is any unexpected issue.</p> </div>}
         </div>
       </div>
     </div>

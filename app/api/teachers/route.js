@@ -25,7 +25,7 @@ export async function POST(req) {
     // Create the new student in the database
     await prisma.Teachers.create({
       data: {
-        firstName,lastName,email,password:"Def"
+        firstName,lastName,email,password:"ronsard@123"
       },
     });
 

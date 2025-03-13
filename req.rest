@@ -54,3 +54,6 @@ http://localhost:3000/api/teachers/cm7vzroq0000511gelm2b0lfb/assignedClasses
 
 ###
 http://localhost:3000/api/classes/sections/cm7krbcfe00028uq3t9fnv9d6
+
+###
+http://localhost:3000/api/students/1/comments

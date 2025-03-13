@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function StudentComment({ params }) {
   const router = useRouter();
@@ -48,21 +49,49 @@ export default function StudentComment({ params }) {
 
   const [className, setClassName] = useState("");
 
+  const [studentName,setStudentName] = useState("")
+
   const [loading, setLoading] = useState(true);
 
+  const [userIdentity, setUserIdentity] = useState("");
+
   useEffect(() => {
+
+    if (!localStorage.getItem("identity")) {
+      toast.error("Please login to access this page!");
+      router.replace("/");
+      return;
+    }
+
+    setUserIdentity(localStorage.getItem("userIdentity"));
+
     setClassName(localStorage.getItem("className"));
 
     const getStudentRecentComments = async () => {
       try {
         const response = await fetch(`/api/students/${studentId}/comments`);
+
+        const responseData = await response.json()
+
+        if(!response.ok){
+          toast.error(responseData.message)
+          return
+        }
+
+        setStudentName(`${responseData.student.fName} ${responseData.student.lName}`)
+
+
       } catch (e) {
         console.log(e);
       } finally {
         setLoading(false);
       }
     };
+
+    getStudentRecentComments()
+
   }, []);
+  
 
   return (
     <div>
@@ -70,8 +99,12 @@ export default function StudentComment({ params }) {
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
           <h2 className="text-2xl font-bold">Teacher's Dashboard</h2>
-          <p className="bg-black p-2 rounded text-sm text-white text-center font-bold">
-            Micheal Osei
+          <p
+            className={`bg-black p-2 rounded text-sm text-white text-center font-bold ${
+              !userIdentity && "animate-pulse py-4"
+            }`}
+          >
+            {userIdentity}
           </p>
         </div>
         <div className="text-right">
@@ -126,7 +159,7 @@ export default function StudentComment({ params }) {
           </button>
 
           <p className="text-sm text-gray-400 font-medium">
-            {className} / Emmanuel Asare
+            {className} / {studentName}
           </p>
         </div>
 
