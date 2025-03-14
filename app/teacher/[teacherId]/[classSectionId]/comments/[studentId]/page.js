@@ -2,61 +2,28 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { NewComment } from "./newComment";
 
 export default function StudentComment({ params }) {
   const router = useRouter();
 
   const { studentId } = use(params);
 
-  const studentComments = [
-    {
-      student: "James Anderson",
-      academicYr: "2024/2025",
-      academicTerm: "Term 1",
-      comment:
-        "James is highly engaged in Science and enjoys hands-on activities. However, he sometimes struggles with staying focused during theoretical lessons and needs to improve his attention to detail in written work.",
-      by: "Mr. Johnson",
-      approvedBy: "Mrs. Williams",
-    },
-    {
-      student: "James Anderson",
-      academicYr: "2024/2025",
-      academicTerm: "Term 2",
-      comment:
-        "James is consistent with his assignments and has a great work ethic. However, he tends to rush through tasks, leading to avoidable mistakes. Encouraging him to review his work before submission would be beneficial.",
-      by: "Ms. Carter",
-      approvedBy: "Dr. Miller",
-    },
-    {
-      student: "James Anderson",
-      academicYr: "2024/2025",
-      academicTerm: "Term 3",
-      comment:
-        "James collaborates well with peers and is always willing to help others. However, he sometimes hesitates to ask for help when he is struggling, particularly in Math. Building confidence in seeking clarification would improve his overall performance.",
-      by: "Mr. Davis",
-      approvedBy: "Mr. Thompson",
-    },
-    {
-      student: "James Anderson",
-      academicYr: "2024/2025",
-      academicTerm: "Term 4",
-      comment:
-        "James has shown improvement in leadership skills and class participation. However, his time management could use some work, especially during group projects where he occasionally procrastinates. Encouraging better planning and organization will help him succeed.",
-      by: "Mrs. Brown",
-      approvedBy: "Mr. Lewis",
-    },
-  ];
-
   const [className, setClassName] = useState("");
 
-  const [studentName,setStudentName] = useState("")
+  const [studentName, setStudentName] = useState("");
 
   const [loading, setLoading] = useState(true);
 
   const [userIdentity, setUserIdentity] = useState("");
 
-  useEffect(() => {
+  const [comments, setComments] = useState([]);
 
+  const [newComment, setNewComment] = useState(false);
+
+  const [previousComments, setPreviousComments] = useState("");
+
+  useEffect(() => {
     if (!localStorage.getItem("identity")) {
       toast.error("Please login to access this page!");
       router.replace("/");
@@ -71,16 +38,24 @@ export default function StudentComment({ params }) {
       try {
         const response = await fetch(`/api/students/${studentId}/comments`);
 
-        const responseData = await response.json()
+        const responseData = await response.json();
 
-        if(!response.ok){
-          toast.error(responseData.message)
-          return
+        if (!response.ok) {
+          toast.error(responseData.message);
+          return;
         }
 
-        setStudentName(`${responseData.student.fName} ${responseData.student.lName}`)
+        setStudentName(
+          `${responseData.student.fName} ${responseData.student.lName}`
+        );
 
+        setComments(responseData.comments);
 
+        setPreviousComments(
+          Array.isArray(responseData.comments)
+            ? responseData.comments.map((comment) => comment.comment).join(", ")
+            : ""
+        );
       } catch (e) {
         console.log(e);
       } finally {
@@ -88,13 +63,19 @@ export default function StudentComment({ params }) {
       }
     };
 
-    getStudentRecentComments()
-
+    getStudentRecentComments();
   }, []);
-  
 
   return (
     <div>
+      {newComment && (
+        <NewComment
+          previousComments={previousComments}
+          studentName={studentName}
+          setNewComment={setNewComment}
+          studentId={studentId}
+        />
+      )}
       <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
@@ -168,6 +149,7 @@ export default function StudentComment({ params }) {
             <h2 className="font-bold">Recent Comments</h2>
 
             <button
+              onClick={() => setNewComment(true)}
               type="button"
               className="p-2 border border-indigo-600 rounded-md flex items-center gap-2 hover:bg-indigo-600 hover:text-white text-sm"
             >
@@ -191,7 +173,7 @@ export default function StudentComment({ params }) {
           </div>
 
           <div className="grid grid-cols-2 mt-5 gap-5">
-            {studentComments.map((comment, index) => (
+            {comments.map((comment, index) => (
               <div
                 key={index}
                 className="bg-indigo-800 rounded-md border-indigo-600 p-3"
@@ -199,7 +181,9 @@ export default function StudentComment({ params }) {
                 <div className="flex justify-between text-gray-100 text-sm">
                   <h2 className="font-bold">{comment.academicYr}</h2>
 
-                  <h2 className="font-bold mb-5">{comment.academicTerm}</h2>
+                  <h2 className="font-bold mb-5">
+                    Term: {comment.academicTerm}
+                  </h2>
                 </div>
 
                 <div className="text-white text-sm mb-5 border-b pb-3">
@@ -207,9 +191,9 @@ export default function StudentComment({ params }) {
                 </div>
 
                 <div className="flex justify-between text-gray-100 text-sm">
-                  <div> By: {comment.by} </div>
+                  <div> By: {"comment.by"} </div>
 
-                  <div> Approved By: {comment.approvedBy} </div>
+                  <div> Approved By: {"comment.approvedBy"} </div>
                 </div>
               </div>
             ))}

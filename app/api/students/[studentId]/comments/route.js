@@ -3,57 +3,98 @@ import { NextResponse } from "next/server";
 
 // import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { toast } from "react-toastify";
 // import { verifyToken } from "@/actions/action";
 
-export async function GET(req,{params}) {
-    try {
-      // Parse query parameters
-      const {studentId} = await params
-  
-      // Fetch students from the database
-      const student = await prisma.students.findUnique({
-        where : {
-            id : parseInt(studentId)
-        }
-      });
-  
-      // Return the list of students
-      return NextResponse.json({ student }, { status: 200 });
-    } catch (error) {
-      console.error("Error fetching student:", error);
+
+export async function GET(req, { params }) {
+  try {
+    const { studentId } = params;
+
+    // Convert studentId to integer
+    const studentIdInt = parseInt(studentId);
+    if (isNaN(studentIdInt)) {
       return NextResponse.json(
-        { error: "Internal Server Error" },
-        { status: 500 }
+        { error: "Invalid student ID" },
+        { status: 400 }
       );
     }
-  }
 
+    // Fetch student details
+    const student = await prisma.students.findUnique({
+      where: { id: studentIdInt },
+    });
 
-  export async function POST(req) {
-    try {
-      const body = await req.json();
-  
-      // Ensure body contains required fields
-      if (!body || !body.comments || !Array.isArray(body.comments)) {
-        return NextResponse.json(
-          { message: "Invalid request. 'comments' must be an array." },
-          { status: 400 }
-        );
-      }
-  
-      // Insert comments into the database
-      const createdComments = await prisma.Comments.createMany({
-        data: body.comments.map(comment => ({
-          studentId: comment.studentId,
-          academicYr: comment.academicYr,
-          academicTerm: comment.academicTerm,
-          comment: comment.comment
-        })),
-      });
-  
-      return NextResponse.json({ message : "Comments Uploaded Successfully!" }, { status: 201 });
-    } catch (error) {
-      console.error("Error inserting comments:", error);
-      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    if (!student) {
+      return NextResponse.json(
+        { error: "Student not found" },
+        { status: 404 }
+      );
     }
+
+    // Fetch previous comments for the student
+    const comments = await prisma.Comments.findMany({
+      where: { studentId: student.studentId },
+      orderBy: { academicYr: "desc" }, // Sort by latest academic year
+    });
+
+    return NextResponse.json(
+      { student, comments },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error fetching student and comments:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
+}
+
+export async function POST(req,{params}){
+    try{
+        // extract body params
+        const {comment} = await req.json()
+
+        const {studentId} = await params
+
+        const student = await prisma.students.findUnique({
+            where : {
+                id : parseInt(studentId)
+            }
+        })
+
+        if(!comment){
+
+            return NextResponse.json(
+                { message: "Please provide the required params." },
+                { status: 400 }
+              );
+        }
+
+        const createComment = await prisma.Comments.create({
+            data : {
+                academicYr : "2024/2025",
+                academicTerm : "Term 2",
+                comment,
+                studentId : student.studentId
+            }
+        })
+
+        if(!createComment){
+            return NextResponse.json(
+                { message: "Unexpected error while creating comment, please try again later." },
+                { status: 400 }
+              );
+        }
+
+        return NextResponse.json(
+            { message: "Comment created successful!" },
+            { status: 200 }
+          );
+
+    }catch(e){
+        console.log(e)
+        toast.error("Internal Server Error!")
+    }
+}
