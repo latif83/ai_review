@@ -44,6 +44,33 @@ export default function ViewStudentComment({ params }) {
     }
   }, [fetchData]);
 
+  const [aLoading, setALoading] = useState(false);
+  const [commentId, setCommentId] = useState();
+
+  const ApproveComment = async () => {
+    setALoading(true);
+    try {
+      const response = await fetch(`/api/students/${studentId}/comments`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approvedBy: "Management", commentId }),
+      });
+
+      const responseData = await response.json();
+      if (!response.ok) {
+        toast.error(responseData.message);
+        return;
+      }
+
+      toast.success(responseData.message);
+      setFetchData(true);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setALoading(false);
+    }
+  };
+
   return (
     <div className="px-5 py-5">
       <div className="mb-5 flex justify-between items-center">
@@ -123,11 +150,26 @@ export default function ViewStudentComment({ params }) {
 
                 <div>
                   {" "}
-                  Approved By: {comment.approvedBy
-                    ? comment.approvedBy
+                  Approved By: {comment.ApprovedBy
+                    ? comment.ApprovedBy
                     : "N/A"}{" "}
                 </div>
               </div>
+
+              {!comment.ApprovedBy && (
+                <div className="flex justify-between items-center mt-1">
+                  <button
+                    onClick={() => {
+                      setCommentId(comment.id);
+                      ApproveComment();
+                    }}
+                    type="button"
+                    className="bg-lime-600 p-2 text-white rounded-md text-xs"
+                  >
+                    Approve
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

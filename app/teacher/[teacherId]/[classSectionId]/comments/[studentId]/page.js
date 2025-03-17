@@ -205,7 +205,7 @@ export default function StudentComment({ params }) {
                   <div>
                     {" "}
                     Approved By:{" "}
-                    {comment.approvedBy ? comment.approvedBy : "N/A"}{" "}
+                    {comment.ApprovedBy ? comment.ApprovedBy : "N/A"}{" "}
                   </div>
                 </div>
               </div>
