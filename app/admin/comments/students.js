@@ -92,7 +92,7 @@ export const Students = ({setViewStudents,sectionData})=>{
             <input
               type="search"
               id="default-search"
-              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               placeholder="Search for a student..."
               required
             />
@@ -131,7 +131,7 @@ export const Students = ({setViewStudents,sectionData})=>{
               ))
             : students.length > 0 ? students.map((stud, index) => (
                 <Link
-                  href={`#`}
+                  href={`/admin/comments/${stud.id}`}
                   key={index}
                   className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md text-sm"
                 >
