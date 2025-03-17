@@ -1,15 +1,19 @@
 "use client"
 import { useState } from "react";
 import { ExistingCommentsUpload } from "./existingCommentsUpload";
+import { ViewApproveComment } from "./viewApproveComment";
 
 export default function Comments() {
 
     const [uploadExistingComments,setUploadExistingComments] = useState(false)
+    const [viewComments,setViewComments] = useState(false)
 
   return (
     <div className="px-5 py-5">
 
       {uploadExistingComments && <ExistingCommentsUpload setUploadExistingComments={setUploadExistingComments} />}
+
+      {viewComments && <ViewApproveComment setViewComments={setViewComments} />}
 
       <div className="mb-5 flex justify-between items-center">
         <div
@@ -38,7 +42,7 @@ flex items-center gap-2"
       <div className="">
         <p className="text-sm">Please select an action to perform!</p>
 
-        <div className="mt-3">
+        <div className="mt-3 flex gap-4">
           <button
           onClick={()=>setUploadExistingComments(true)}
             type="button"
@@ -60,6 +64,19 @@ flex items-center gap-2"
             </svg>
 
             <span>Upload Existing Comments</span>
+          </button>
+
+          <button
+          onClick={()=>setViewComments(true)}
+            type="button"
+            className="p-2 text-sm bg-lime-600 hover:bg-lime-800 text-white rounded-md flex items-center justify-center gap-2"
+          >
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+</svg>
+
+
+            <span>View / Approve Comments</span>
           </button>
         </div>
       </div>
