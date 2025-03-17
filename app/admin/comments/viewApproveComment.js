@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Students } from "./students";
+import { toast } from "react-toastify";
 
 export const ViewApproveComment = ({setViewComments}) => {
   const [classes, setClasses] = useState([]);
 
   const [classesLoading, setClassesLoading] = useState(false);
 
-  const [sectionActions, setSectionActions] = useState(false);
+  const [viewStudents, setViewStudents] = useState(false);
   const [sectionData, setSectionData] = useState();
 
   const [fetchData, setFetchData] = useState(true);
@@ -41,6 +43,7 @@ export const ViewApproveComment = ({setViewComments}) => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
+        {viewStudents && <Students setViewStudents={setViewStudents} sectionData={sectionData} />}
       <div className="max-w-4xl overflow-auto transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
         <div className="flex justify-between items-center">
           <h1 className="font-medium">View / Approve Comments</h1>
@@ -69,7 +72,7 @@ export const ViewApproveComment = ({setViewComments}) => {
         <div className="pt-6">
           <p className="text-sm text-gray-600">
             Please select a class by selecting a class section below to view
-            comments.
+            students available.
           </p>
 
           <div className="grid grid-cols-3 gap-4 mt-5">
@@ -88,7 +91,7 @@ export const ViewApproveComment = ({setViewComments}) => {
                         <span
                           key={index}
                           onClick={() => {
-                            setSectionActions(true);
+                            setViewStudents(true);
                             setSectionData({
                               classId: clas.id,
                               className: clas.className,
