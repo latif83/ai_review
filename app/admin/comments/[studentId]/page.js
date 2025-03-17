@@ -1,52 +1,48 @@
-"use client"
+"use client";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-export default function ViewStudentComment({params}) {
+export default function ViewStudentComment({ params }) {
+  const router = useRouter();
 
-    const router = useRouter()
+  const { studentId } = use(params);
 
-    const {studentId} = use(params)
+  const [fetchData, setFetchData] = useState(true);
 
-      const [fetchData, setFetchData] = useState(true);
+  const [studentName, setStudentName] = useState("");
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-      const [studentName,setStudentName] = useState("")
-      const [comments,setComments] = useState([])
-      const [loading,setLoading] = useState(true)
-    
-      useEffect(() => {
-    
-        const getStudentRecentComments = async () => {
-          try {
-            const response = await fetch(`/api/students/${studentId}/comments`);
-    
-            const responseData = await response.json();
-    
-            if (!response.ok) {
-              toast.error(responseData.message);
-              return;
-            }
-    
-            setStudentName(
-              `${responseData.student.fName} ${responseData.student.lName}`
-            );
-    
-            setComments(responseData.comments);
-    
-          } catch (e) {
-            console.log(e);
-          } finally {
-            setLoading(false);
-          }
-        };
-    
-        if (fetchData) {
-          getStudentRecentComments();
-          setFetchData(false)
+  useEffect(() => {
+    const getStudentRecentComments = async () => {
+      try {
+        const response = await fetch(`/api/students/${studentId}/comments`);
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+          toast.error(responseData.message);
+          return;
         }
-    
-      }, [fetchData]);
+
+        setStudentName(
+          `${responseData.student.fName} ${responseData.student.lName}`
+        );
+
+        setComments(responseData.comments);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (fetchData) {
+      getStudentRecentComments();
+      setFetchData(false);
+    }
+  }, [fetchData]);
 
   return (
     <div className="px-5 py-5">
@@ -74,7 +70,7 @@ export default function ViewStudentComment({params}) {
         </div>
 
         <button
-        onClick={()=>router.back()}
+          onClick={() => router.back()}
           type="button"
           className="bg-red-200 hover:bg-red-600 hover:text-white p-2 rounded-md flex items-center justify-center gap-2 text-sm"
         >
@@ -97,36 +93,45 @@ export default function ViewStudentComment({params}) {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 mt-5 gap-5">
-            {comments.map((comment, index) => (
-              <div
-                key={index}
-                className="bg-indigo-800 rounded-md border-indigo-600 p-3"
-              >
-                <div className="flex justify-between text-gray-100 text-sm">
-                  <h2 className="font-bold">{comment.academicYr}</h2>
+      <div className="mt-5">
+        <div className="text-sm p-3 mb-2 text-gray-700 rounded-md bg-gray-200">
+          <p>View Comments for Student:</p>
+          <p className="font-bold">{studentName}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-5">
+          {comments.map((comment, index) => (
+            <div
+              key={index}
+              className="bg-indigo-800 rounded-md border-indigo-600 p-3"
+            >
+              <div className="flex justify-between text-gray-100 text-sm">
+                <h2 className="font-bold">{comment.academicYr}</h2>
 
-                  <h2 className="font-bold mb-5">
-                    {comment.academicTerm == "1st" ? `${comment.academicTerm} Term` : comment.academicTerm }
-                  </h2>
-                </div>
+                <h2 className="font-bold mb-5">
+                  {comment.academicTerm == "1st"
+                    ? `${comment.academicTerm} Term`
+                    : comment.academicTerm}
+                </h2>
+              </div>
 
-                <div className="text-white text-sm mb-5 border-b pb-3">
-                  <p>{comment.comment}</p>
-                </div>
+              <div className="text-white text-sm mb-5 border-b pb-3">
+                <p>{comment.comment}</p>
+              </div>
 
-                <div className="flex justify-between text-gray-100 text-sm">
-                  <div> By: {comment.by ? comment.by : "N/A"} </div>
+              <div className="flex justify-between text-gray-100 text-sm">
+                <div> By: {comment.by ? comment.by : "N/A"} </div>
 
-                  <div>
-                    {" "}
-                    Approved By:{" "}
-                    {comment.approvedBy ? comment.approvedBy : "N/A"}{" "}
-                  </div>
+                <div>
+                  {" "}
+                  Approved By: {comment.approvedBy
+                    ? comment.approvedBy
+                    : "N/A"}{" "}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
