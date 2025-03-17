@@ -23,6 +23,8 @@ export default function StudentComment({ params }) {
 
   const [previousComments, setPreviousComments] = useState("");
 
+  const [fetchData, setFetchData] = useState(true);
+
   useEffect(() => {
     if (!localStorage.getItem("identity")) {
       toast.error("Please login to access this page!");
@@ -63,8 +65,12 @@ export default function StudentComment({ params }) {
       }
     };
 
-    getStudentRecentComments();
-  }, []);
+    if (fetchData) {
+      getStudentRecentComments();
+      setFetchData(false)
+    }
+
+  }, [fetchData]);
 
   return (
     <div>
@@ -74,6 +80,8 @@ export default function StudentComment({ params }) {
           studentName={studentName}
           setNewComment={setNewComment}
           studentId={studentId}
+          teacherName={userIdentity}
+          setFetchData={setFetchData}
         />
       )}
       <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
@@ -90,6 +98,7 @@ export default function StudentComment({ params }) {
         </div>
         <div className="text-right">
           <button
+          onClick={()=>router.replace('/')}
             type="button"
             className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm"
           >
@@ -182,7 +191,7 @@ export default function StudentComment({ params }) {
                   <h2 className="font-bold">{comment.academicYr}</h2>
 
                   <h2 className="font-bold mb-5">
-                    Term: {comment.academicTerm}
+                    {comment.academicTerm == "1st" ? `${comment.academicTerm} Term` : comment.academicTerm }
                   </h2>
                 </div>
 
@@ -191,9 +200,13 @@ export default function StudentComment({ params }) {
                 </div>
 
                 <div className="flex justify-between text-gray-100 text-sm">
-                  <div> By: {"comment.by"} </div>
+                  <div> By: {comment.by ? comment.by : "N/A"} </div>
 
-                  <div> Approved By: {"comment.approvedBy"} </div>
+                  <div>
+                    {" "}
+                    Approved By:{" "}
+                    {comment.approvedBy ? comment.approvedBy : "N/A"}{" "}
+                  </div>
                 </div>
               </div>
             ))}

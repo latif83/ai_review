@@ -66,6 +66,7 @@ export default function TeachersDashboard({ params }) {
         </div>
         <div className="text-right">
           <button
+          onClick={()=>router.replace('/')}
             type="button"
             className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm"
           >

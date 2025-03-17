@@ -35,7 +35,7 @@ export async function GET(req, { params }) {
     // Fetch previous comments for the student
     const comments = await prisma.Comments.findMany({
       where: { studentId: student.studentId },
-      orderBy: { academicYr: "desc" }, // Sort by latest academic year
+      orderBy: { createdAt: "desc" }, // Sort by latest academic year
     });
 
     return NextResponse.json(
@@ -54,7 +54,9 @@ export async function GET(req, { params }) {
 export async function POST(req,{params}){
     try{
         // extract body params
-        const {comment} = await req.json()
+        const {comment,by} = await req.json()
+
+        console.log({comment,by})
 
         const {studentId} = await params
 
@@ -77,7 +79,8 @@ export async function POST(req,{params}){
                 academicYr : "2024/2025",
                 academicTerm : "Term 2",
                 comment,
-                studentId : student.studentId
+                studentId : student.studentId,
+                by
             }
         })
 

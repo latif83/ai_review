@@ -3,11 +3,11 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 // OpenRouter API configuration
-const OPENROUTER_API_KEY = "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"; // Replace this with your OpenRouter API key
+const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY; // Replace this with your OpenRouter API key
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "google/gemma-3-12b-it:free"; // You can also use "gpt-4" or "claude-3-opus"
+const MODEL = process.env.NEXT_PUBLIC_MODEL; // You can also use "gpt-4" or "claude-3-opus"
 
-export const NewComment = ({ previousComments, studentName, setNewComment, studentId }) => {
+export const NewComment = ({ previousComments, studentName, setNewComment, studentId, teacherName, setFetchData }) => {
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState({});
     const [generatedComment, setGeneratedComment] = useState("");
@@ -197,7 +197,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({studentId,comment:generatedComment}),
+                body: JSON.stringify({studentId,comment:generatedComment,by:teacherName}),
             })
 
             const responseData = await response.json()
@@ -207,6 +207,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
             }
 
             toast.success(responseData.message)
+            setFetchData(true)
             setNewComment(false)
         }
         catch(e){
@@ -275,10 +276,37 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                     <div className="flex items-center justify-between mt-2 gap-2 p-4 bg-gray-100 rounded-md text-xs">
                         <p>Do the generated questions seem out of context? Would you like to regenerate them?</p>
                         <button
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        disabled={loading}
+                            className="px-4 py-2 bg-blue-600 disabled:bg-blue-300 flex items-center justify-center gap-2 text-white rounded-md hover:bg-blue-700"
                             onClick={fetchQuestions} // Ensure fetchQuestions is defined and working
                         >
-                            Regenerate Questions
+                            {loading ? (
+                                <>
+                                    <svg
+                                        className="w-5 h-5 animate-spin text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
+                                        ></path>
+                                    </svg>
+                                    Generating Questions...
+                                </>
+                            ) : (
+                                <span>Regenerate Questions</span>
+                            )}
                         </button>
                     </div>
                 )}
