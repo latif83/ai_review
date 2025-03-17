@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req, { params }) {
   try {
     // Parse query parameters
-    const { teacherId } = params;
+    const { teacherId } = await params;
 
     // Validate the input
     if (!teacherId) {

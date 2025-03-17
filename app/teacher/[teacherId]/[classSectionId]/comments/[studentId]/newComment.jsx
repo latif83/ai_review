@@ -3,7 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 // OpenRouter API configuration
-const OPENROUTER_API_KEY = "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"; // Replace this with your OpenRouter API key
+const OPENROUTER_API_KEY = "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"; // Replace this with your OpenRouter API key
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "google/gemma-3-12b-it:free"; // You can also use "gpt-4" or "claude-3-opus"
 
@@ -35,6 +35,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                             - **Return the response as a plain JSON array, without any introductory text, explanation, or extra formatting.**
                             - The response should always **start and end with square brackets** [ ].
                             - Do **not** add words like "Sure" or "Here is your response". Just return the JSON array.
+                            - Also make the english very simple and easy vocabs to understand making it seem real.
                             - Don't add anything like ok this your raw response or anything just array, should strictly start with [] am very keen on this please very important, because am getting the response in my code and any twist of the response would result in an error, and in each array should be an object with key question, and the sub object for the answers should strictly have a key called options.
                             should follow this format exactly:
 
@@ -144,7 +145,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                             role: "user",
                             content: `Based on the following teacher's responses: "${selectedAnswersText}", generate a concise and professional teacher comment assessing the student's progress.  
 
-- The comment should be written **as if a teacher is directly evaluating the student**, avoiding phrases like "we will focus on" or "we are working on."  
+- The comment should be written **as if a teacher is directly evaluating the student by referencing the student name, which is ${studentName} and please do not use vocabs, use simple words for easy understanding to all making it seem real**, avoiding phrases like "we will focus on" or "we are working on."  
 - Structure it in this format:  
   1. **Highlight strengths**: Mention the student’s strong areas.  
   2. **Note areas for improvement**: Point out what they need to improve.  
@@ -158,7 +159,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 - Do **not** include extra text, explanations, or formatting—only the JSON object.`,
                         },
                     ],
-                    max_tokens: 300,
+                    max_tokens: 600,
                 }),
             });
 
