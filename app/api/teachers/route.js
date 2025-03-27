@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req) {
   try {
     // Parse request body for techer data
-    const { firstName,lastName,email} = await req.json();
+    const { firstName, lastName, email } = await req.json();
 
     // Check if required fields are provided
     if (!firstName || !lastName || !email) {
@@ -25,7 +25,10 @@ export async function POST(req) {
     // Create the new student in the database
     await prisma.Teachers.create({
       data: {
-        firstName,lastName,email,password:"ronsard@123"
+        firstName,
+        lastName,
+        email,
+        password: "ronsard@123",
       },
     });
 
@@ -70,6 +73,97 @@ export async function GET(req) {
     console.error("Error fetching teachers:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req) {
+  try {
+    // Parse request body for teacher data
+    const { id, firstName, lastName, email } = await req.json();
+
+    // Check if ID and at least one field to update is provided
+    if (!id || (!firstName && !lastName && !email)) {
+      return NextResponse.json(
+        { message: "Missing required fields!" },
+        { status: 400 }
+      );
+    }
+
+    // Check if the teacher exists
+    const teacherExists = await prisma.Teachers.findUnique({
+      where: { id },
+    });
+
+    if (!teacherExists) {
+      return NextResponse.json(
+        { message: "Teacher not found!" },
+        { status: 404 }
+      );
+    }
+
+    // Update teacher in the database
+    const updatedTeacher = await prisma.Teachers.update({
+      where: { id },
+      data: {
+        firstName,
+        lastName,
+        email,
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Teacher updated successfully!" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating teacher:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    // Parse request body to get the teacher ID
+    const { teacherId:id } = await req.json();
+
+    // Check if the ID is provided
+    if (!id) {
+      return NextResponse.json(
+        { message: "Teacher ID is required!" },
+        { status: 400 }
+      );
+    }
+
+    // Check if the teacher exists
+    const teacherExists = await prisma.Teachers.findUnique({
+      where: { id: id },
+    });
+
+    if (!teacherExists) {
+      return NextResponse.json(
+        { message: "Teacher not found!" },
+        { status: 404 }
+      );
+    }
+
+    // Delete the teacher from the database
+    await prisma.Teachers.delete({
+      where: { id: id },
+    });
+
+    return NextResponse.json(
+      { message: "Teacher deleted successfully!" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
       { status: 500 }
     );
   }

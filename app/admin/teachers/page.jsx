@@ -1,6 +1,8 @@
 "use client"
 import { useEffect, useState } from "react";
 import { NewTeacher } from "./newTeacher";
+import { EditTeacher } from "./editTeacher";
+import { DelTeacher } from "./delTeacher";
 // import { NewStudent } from "./newStudent";
 
 export default function Teachers() {
@@ -39,10 +41,21 @@ export default function Teachers() {
         }
     }, [fetchData])
 
+    const [editTeacher, setEditTeacher] = useState(false)
+
+    const [teacherData, setTeacherData] = useState()
+
+    const [delTeacher, setDelTeacher] = useState(false)
+    const [teacherId, setTeacherId] = useState()
+
     return (
         <div className="px-5 py-5">
 
             {addTeacher && <NewTeacher setAddTeacher={setAddTeacher} setFetchData={setFetchData} />}
+
+            {editTeacher && <EditTeacher setEditTeacher={setEditTeacher} teacherData={teacherData} setFetchData={setFetchData} />}
+
+            {delTeacher && <DelTeacher setDelTeacher={setDelTeacher} teacherId={teacherId} setFetchData={setFetchData} />}
 
             <div className="mb-5 flex justify-between items-center">
                 <div className="
@@ -139,8 +152,14 @@ flex items-center gap-2">
                                     4
                                 </td>
                                 <td className="px-6 py-4">
-                                    <a href="#" className="font-medium text-blue-600 hover:underline mr-2">Edit</a>
-                                    <a href="#" className="font-medium text-red-600 hover:underline">Delete</a>
+                                    <button onClick={() => {
+                                        setTeacherData(teacher)
+                                        setEditTeacher(true)
+                                    }} type="button" className="font-medium text-blue-600 hover:underline mr-2">Edit</button>
+                                    <button type="button" onClick={() => {
+                                        setTeacherId(teacher.id)
+                                        setDelTeacher(true)
+                                    }} className="font-medium text-red-600 hover:underline">Delete</button>
                                 </td>
                             </tr>)) : <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                             <td colSpan={4} className="px-6 py-4">
