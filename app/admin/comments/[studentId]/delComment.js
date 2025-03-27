@@ -54,7 +54,7 @@ export const DeleteComments = ({ setDelComment,commentId, setFetchData, setViewC
                         <button onClick={()=>setDelComment(false)} className="p-2 bg-red-600 hover:bg-red-800 text-white transition duration-500 rounded-md" type="button">
                             Cancel
                         </button>
-                        <button onClick={delComment} disabled={loading} className="p-2 bg-green-600 hover:bg-green-800 text-white transition duration-500 rounded-md flex gap-1.5 items-center disabled:bg-green-300 disabled:text-black" type="button">
+                        <button onClick={delComment} disabled={loading} className="p-2 bg-green-600 hover:bg-green-800 text-white transition duration-500 rounded-md flex gap-1.5 items-center disabled:bg-green-300" type="button">
                             {loading ? (
                                 <>
                                     <svg
