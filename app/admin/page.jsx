@@ -1,4 +1,41 @@
+"use client"
+import { useEffect, useState } from "react"
+import { toast } from "react-toastify"
+
 export default function Dashboard() {
+
+    const [loading, setLoading] = useState(true)
+
+    const [summaryData,setSummaryData] = useState(null)
+
+    useEffect(() => {
+
+        const getSummaryData = async () => {
+            try {
+
+                const response = await fetch(`/api/summary`)
+                const responseData = await response.json()
+
+                if (!response.ok) {
+                    toast.error(responseData.message)
+                    return
+                }
+                setSummaryData(responseData)
+                toast.success(responseData.message)
+
+            }
+            catch (e) {
+                console.log(e)
+                toast.error("Internal server error!")
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        getSummaryData()
+
+    }, [])
+
     return (
         <div className="px-5 py-5">
             <h1 className="text-gray-900 text-2xl font-bold mb-5">Dashboard</h1>
@@ -19,8 +56,7 @@ export default function Dashboard() {
 
 
                     </div>
-                    <p className="text-2xl font-bold text-gray-800">20</p>
-                    {/* {loading ? <span className="w-32 h-6 animate-pulse bg-gray-300 block mt-3 rounded-md"></span> : <p className="text-2xl font-bold text-gray-800">{applicationCounts}</p>} */}
+                    {loading ? <span className="w-32 h-6 animate-pulse bg-gray-300 block mt-3 rounded-md"></span> : <p className="text-2xl font-bold text-gray-800">{summaryData.students}</p>}
                 </div>
 
                 <div className="bg-white p-4 border rounded-lg shadow-lg">
@@ -37,8 +73,7 @@ export default function Dashboard() {
 
 
                     </div>
-                    <p className="text-2xl font-bold text-gray-800">5</p>
-                    {/* {loading ? <span className="w-32 h-6 animate-pulse bg-gray-300 block mt-3 rounded-md"></span> : <p className="text-2xl font-bold text-gray-800">{applicationCounts}</p>} */}
+                    {loading ? <span className="w-32 h-6 animate-pulse bg-gray-300 block mt-3 rounded-md"></span> : <p className="text-2xl font-bold text-gray-800">{summaryData.teachers}</p>}
                 </div>
 
                 <div className="bg-white p-4 border rounded-lg shadow-lg">
@@ -57,8 +92,7 @@ export default function Dashboard() {
 
 
                     </div>
-                    <p className="text-2xl font-bold text-gray-800">5</p>
-                    {/* {loading ? <span className="w-32 h-6 animate-pulse bg-gray-300 block mt-3 rounded-md"></span> : <p className="text-2xl font-bold text-gray-800">{applicationCounts}</p>} */}
+                    {loading ? <span className="w-32 h-6 animate-pulse bg-gray-300 block mt-3 rounded-md"></span> : <p className="text-2xl font-bold text-gray-800">{summaryData.classes}</p>}
                 </div>
 
 

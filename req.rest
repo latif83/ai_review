@@ -70,3 +70,6 @@ Content-Type: application/json
 
 ###
 http://localhost:3000/api/classes/sections/cm7n3pg32000c89949of41yy5
+
+###
+http://localhost:3000/api/summary
