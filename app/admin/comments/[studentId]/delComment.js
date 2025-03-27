@@ -1,45 +1,43 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export const DelStudent = ({ setDelStudent,studentId,setFetchData }) => {
+export const DeleteComments = ({ setDelComment,commentId, setFetchData, setViewComment }) => {
 
     const [loading,setLoading] = useState(false)
 
-    const deleteStudent = async () => {
-            try {
-                setLoading(true)
-              const response = await fetch("/api/students", {
-                method: "DELETE",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ studentId }),
-              });
+
+           const delComment = async () => {
+              setLoading(true);
+              try {
+                const response = await fetch(`/api/students/comments/${commentId}`, {
+                  method: "DELETE"
+                });
           
-              const data = await response.json();
+                const responseData = await response.json();
+                if (!response.ok) {
+                  toast.error(responseData.message);
+                  return;
+                }
           
-              if (response.ok) {
-                toast.success("Student deleted successfully!");
-                setFetchData(true)
-                setDelStudent(false)
-              } else {
-                toast.error("Error:", data.message);
+                toast.success(responseData.message);
+                setFetchData(true);
+                setViewComment(false)
+                // setDelComment(false)
+              } catch (e) {
+                console.log(e);
+              } finally {
+                setLoading(false);
               }
-            } catch (error) {
-              console.error("Request failed:", error);
-            } finally{
-                setLoading(false)
-            }
-          };
+            };
 
     return (
         <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
             <div className="max-w-xl transition duration-1000 bg-white mx-auto rounded-xl p-3">
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium">
-                        Delete Student
+                        Delete Comment
                     </h1>
-                    <button onClick={() => setDelStudent(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
+                    <button onClick={() => setDelComment(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -49,14 +47,14 @@ export const DelStudent = ({ setDelStudent,studentId,setFetchData }) => {
 
                 <div className="mt-5">
                     <p className="text-sm">
-                        Are you sure you want to delete this student?
+                        Are you sure you want to delete this comment?
                     </p>
 
                     <div className="mt-5 flex justify-between">
-                        <button onClick={()=>setDelStudent(false)} className="p-2 bg-red-600 hover:bg-red-800 text-white transition duration-500 rounded-md" type="button">
+                        <button onClick={()=>setDelComment(false)} className="p-2 bg-red-600 hover:bg-red-800 text-white transition duration-500 rounded-md" type="button">
                             Cancel
                         </button>
-                        <button disabled={loading} onClick={deleteStudent} className="p-2 bg-green-600 hover:bg-green-800 text-white transition duration-500 rounded-md flex gap-1.5 items-center disabled:bg-green-300 disabled:text-black" type="button">
+                        <button onClick={delComment} disabled={loading} className="p-2 bg-green-600 hover:bg-green-800 text-white transition duration-500 rounded-md flex gap-1.5 items-center disabled:bg-green-300 disabled:text-black" type="button">
                             {loading ? (
                                 <>
                                     <svg

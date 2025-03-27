@@ -54,7 +54,7 @@ export default function ViewStudentComment({ params }) {
   return (
     <div className="px-5 py-5">
 
-      {viewComment && <ViewComment setViewComment={setViewComment} comment={commentData} studentId={studentId} />}
+      {viewComment && <ViewComment setViewComment={setViewComment} comment={commentData} studentId={studentId} setFetchData={setFetchData} />}
       <div className="mb-5 flex justify-between items-center">
         <div
           className="

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { ApproveComments } from "./approveComment";
 import { EditComment } from "./editComment";
 import { toast } from "react-toastify";
+import { DeleteComments } from "./delComment";
 
-export const ViewComment = ({ setViewComment, comment, studentId }) => {
+export const ViewComment = ({ setViewComment, comment, studentId, setFetchData }) => {
   const [approveComment, setApproveComment] = useState(false);
 
   const [editComment, setEditComment] = useState(false);
@@ -40,6 +41,8 @@ export const ViewComment = ({ setViewComment, comment, studentId }) => {
     }
   },[fC])
 
+  const [delComment,setDelComment] = useState(false)
+
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       {approveComment && (
@@ -58,6 +61,8 @@ export const ViewComment = ({ setViewComment, comment, studentId }) => {
           setFC={setFC}
         />
       )}
+
+      {delComment && <DeleteComments setDelComment={setDelComment} commentId={comment.id} setFetchData={setFetchData} setViewComment={setViewComment} /> }
 
       <div className="max-w-4xl relative transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
         <div className="flex justify-between items-center">
@@ -164,6 +169,7 @@ export const ViewComment = ({ setViewComment, comment, studentId }) => {
               </button>
 
               <button
+              onClick={()=>setDelComment(true)}
                 type="button"
                 className="bg-red-600 hover:bg-red-800 text-white p-2 rounded-md flex gap-1.5 items-center text-sm"
               >
