@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { toast } from "react-toastify";
 // import { verifyToken } from "@/actions/action";
 
+export const dynamic = "force-dynamic";
+
 
 export async function GET(req, { params }) {
   try {

@@ -1,15 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ApproveComments } from "./approveComment";
+import { EditComment } from "./editComment";
+import { toast } from "react-toastify";
 
 export const ViewComment = ({ setViewComment, comment, studentId }) => {
-
   const [approveComment, setApproveComment] = useState(false);
+
+  const [editComment, setEditComment] = useState(false);
+
+  const [comm,setComment] = useState(comment.comment)
+
+  const [fC,setFC] = useState(false)
+
+  const getCommentData = async () => {
+    try {
+      const response = await fetch(`/api/students/comments/${comment.id}`);
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        toast.error(responseData.message);
+        return;
+      }
+
+      setComment(responseData.comment.comment)
+
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+    //   setLoading(false);
+    }
+  };
+
+  useEffect(()=>{
+    if(fC){
+    getCommentData()
+    setFC(false)
+    }
+  },[fC])
 
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       {approveComment && (
-        <ApproveComments setApproveComment={setApproveComment} commentId={comment.id} studentId={studentId} />
+        <ApproveComments
+          setApproveComment={setApproveComment}
+          commentId={comment.id}
+          studentId={studentId}
+        />
       )}
+
+      {editComment && (
+        <EditComment
+          setEditComment={setEditComment}
+          comment={{id:comment.id,comment:comm}}
+          studentId={studentId}
+          setFC={setFC}
+        />
+      )}
+
       <div className="max-w-4xl relative transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
         <div className="flex justify-between items-center">
           <h1 className="font-medium">View Comment</h1>
@@ -46,7 +95,7 @@ export const ViewComment = ({ setViewComment, comment, studentId }) => {
             </h2>
           </div>
 
-          <p className="text-sm border-b pb-5">{comment.comment}</p>
+          <p className="text-sm border-b pb-5">{comm}</p>
 
           <div className="flex justify-between mt-5 pb-5 border-b">
             <p className="text-sm">
@@ -67,7 +116,7 @@ export const ViewComment = ({ setViewComment, comment, studentId }) => {
               {!comment.ApprovedBy && (
                 <>
                   <button
-                  onClick={()=>setApproveComment(true)}
+                    onClick={() => setApproveComment(true)}
                     type="button"
                     className="bg-lime-600 hover:bg-lime-800 text-white p-2 rounded-md flex gap-1.5 items-center text-sm"
                   >
@@ -93,6 +142,7 @@ export const ViewComment = ({ setViewComment, comment, studentId }) => {
 
               <button
                 type="button"
+                onClick={() => setEditComment(true)}
                 className="bg-cyan-600 hover:bg-cyan-800 text-white p-2 rounded-md flex gap-1.5 items-center text-sm"
               >
                 <svg
