@@ -1,64 +1,37 @@
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
-export const NewStudent = ({ setAddStudent, setFetchData }) => {
+export const NewStudent = ({ setAddStudent, setFetchData, classId }) => {
 
     const [formData, setFormData] = useState({
         fName: "",
         lName: "",
         studentId: "",
-        classId: "",
+        classId,
         classSectionsId: ""
     })
 
     const [loading, setLoading] = useState(false)
 
-    const [classes, setClasses] = useState([])
-    const [classesLoading, setClassesLoading] = useState(false)
-
     const [classSections, setClassSections] = useState([])
     const [classSectionsLoading, setClassSectionsLoading] = useState(false)
 
-    const [filteredClassSections, setFilteredClassSections] = useState([])
+    const [fecthSectionData, setFetchSectionData] = useState(true)
 
     useEffect(() => {
-        const getClasses = async () => {
-            setClassesLoading(true)
-            try {
-                const response = await fetch(`/api/classes`)
-
-                if (!response.ok) {
-                    // Error here
-                    return
-                }
-
-                const responseData = await response.json()
-
-                setClasses(responseData.classes)
-
-
-
-            } catch (e) {
-                console.log(e)
-            } finally {
-                setClassesLoading(false)
-            }
-        }
 
         const getClassSections = async () => {
             setClassSectionsLoading(true)
             try {
-                const response = await fetch(`/api/classes/sections`)
-
+                const response = await fetch(`/api/classes/${classId}`)
+                const responseData = await response.json()
                 if (!response.ok) {
                     // Error here
+                    toast.error(responseData.message)
                     return
                 }
 
-                const responseData = await response.json()
-
                 setClassSections(responseData.classSections)
-
 
 
             } catch (e) {
@@ -68,9 +41,11 @@ export const NewStudent = ({ setAddStudent, setFetchData }) => {
             }
         }
 
-        getClasses()
-        getClassSections()
-    }, [])
+        if (fecthSectionData) {
+            getClassSections()
+            setFetchSectionData(false)
+        }
+    }, [fecthSectionData])
 
     const submitStudentData = async (e) => {
         e.preventDefault()
@@ -107,14 +82,6 @@ export const NewStudent = ({ setAddStudent, setFetchData }) => {
         }
     }
 
-    const handleClassSectionsFilter = () => {
-        setFilteredClassSections(classSections.filter((section) => (section.classId == formData.classId)))
-    }
-
-    useEffect(() => {
-        formData.classId && handleClassSectionsFilter()
-    }, [formData])
-
     return (
         <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
             <div className="max-w-4xl transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
@@ -145,23 +112,13 @@ export const NewStudent = ({ setAddStudent, setFetchData }) => {
                     </div>
 
                     <div className="col-span-2 mt-5">
-                        <h1 className="text-sm font-bold text-gray-600">Assign to className</h1>
-                        <div className="grid grid-cols-2 gap-4 mt-5">
-                            <div>
-                                <label htmlFor="className" className="block mb-2 text-sm font-medium text-gray-900">Select a class for student</label>
-                                <select id="className" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classId: e.target.value }))}>
-                                    <option>Choose a className</option>
-                                    {classes.map((clas, index) => (<option key={index} value={clas.id}>{clas.className}</option>))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a className Session</label>
-                                <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
-                                    <option>Choose a class section</option>
-                                    {filteredClassSections.length > 0 ? filteredClassSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
-                                </select>
-                            </div>
+                        <h1 className="text-sm font-bold text-gray-600">Assign to class section</h1>
+                        <div className="mt-5">
+                            <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a class Section</label>
+                            <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
+                                <option>Choose a class section</option>
+                                {classSections.length > 0 ? classSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
+                            </select>
                         </div>
                     </div>
 
