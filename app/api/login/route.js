@@ -66,7 +66,7 @@ export async function POST(req) {
         { expiresIn: "2h" } // Token expiration time (e.g., 2 hours)
       );
 
-      cookies().set("access-token", token, {
+      await cookies().set("access-token", token, {
         path: "/",
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // Enable for HTTPS in production

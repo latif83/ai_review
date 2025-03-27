@@ -1,15 +1,20 @@
 "use client"
 import { useEffect, useState } from "react";
 import { NewStudent } from "./newStudent";
+import { EditStudent } from "./editStudent";
+import { toast } from "react-toastify";
 
 export default function Students() {
 
     const [addStudent, setAddStudent] = useState(false)
+    const [editStudent, setEditStudent] = useState(false)
+
+    const [studentData, setStudentData] = useState()
 
     const [students, setStudents] = useState([])
     const [loadingStudents, setLoadingStudents] = useState(false)
 
-    const [fetchData,setFetchData] = useState(true)
+    const [fetchData, setFetchData] = useState(true)
 
     useEffect(() => {
         const fetchStudentsData = async () => {
@@ -32,17 +37,42 @@ export default function Students() {
             }
         }
 
-        if(fetchData){
-        fetchStudentsData()
-        setFetchData(false)
+        if (fetchData) {
+            fetchStudentsData()
+            setFetchData(false)
         }
     }, [fetchData])
+
+    const deleteStudent = async (studentId) => {
+        try {
+          const response = await fetch("/api/students", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ studentId }),
+          });
+      
+          const data = await response.json();
+      
+          if (response.ok) {
+            toast.success("Student deleted successfully!");
+            setFetchData(true)
+          } else {
+            toast.error("Error:", data.message);
+          }
+        } catch (error) {
+          console.error("Request failed:", error);
+        }
+      };
+      
 
     return (
         <div className="px-5 py-5">
 
             {addStudent && <NewStudent setAddStudent={setAddStudent} setFetchData={setFetchData} />}
 
+            {editStudent && <EditStudent setEditStudent={setEditStudent} setFetchData={setFetchData} studentData={studentData} />}
 
             <div className="mb-5 flex justify-between items-center">
                 <div className="
@@ -100,7 +130,7 @@ flex items-center gap-2">
                         </tr>
                     </thead>
                     <tbody>
-                        {loadingStudents ? [1, 2, 3, 4, 5, 6, 7, 8].map((n,index) => (<tr key={index} className="odd:bg-white even:bg-gray-50 border-b border-gray-200 animate-pulse">
+                        {loadingStudents ? [1, 2, 3, 4, 5, 6, 7, 8].map((n, index) => (<tr key={index} className="odd:bg-white even:bg-gray-50 border-b border-gray-200 animate-pulse">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                 <span className="bg-gray-200 rounded-lg h-[30px] w-full block">
 
@@ -124,7 +154,7 @@ flex items-center gap-2">
 
                                 </span>
                             </td>
-                        </tr>)) : students.length > 0 ? students.map((student,index) => (<tr key={index} className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                        </tr>)) : students.length > 0 ? students.map((student, index) => (<tr key={index} className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                 {`${student.fName} ${student.lName}`}
                             </th>
@@ -135,8 +165,11 @@ flex items-center gap-2">
                                 {`${student.class.className} ( ${student.ClassSections.sectionName} )`}
                             </td>
                             <td className="px-6 py-4">
-                                <a href="#" className="font-medium text-blue-600 hover:underline mr-2">Edit</a>
-                                <a href="#" className="font-medium text-red-600 hover:underline">Delete</a>
+                                <button type="button" onClick={() => {
+                                    setEditStudent(true)
+                                    setStudentData(student)
+                                }} className="font-medium text-blue-600 hover:underline mr-2">Edit</button>
+                                <button onClick={()=>deleteStudent(student.id)} type="button" className="font-medium text-red-600 hover:underline">Delete</button>
                             </td>
                         </tr>)) : <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                             <td colSpan={4} className="px-6 py-4">
