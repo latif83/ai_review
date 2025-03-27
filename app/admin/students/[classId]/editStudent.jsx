@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
-export const EditStudent = ({ setEditStudent, setFetchData,studentData }) => {
+export const EditStudent = ({ setEditStudent, setFetchData, studentData }) => {
 
     const [formData, setFormData] = useState({
         fName: studentData.fName,
@@ -111,12 +111,12 @@ export const EditStudent = ({ setEditStudent, setFetchData,studentData }) => {
                     <div className="col-span-2 mt-5">
                         <h1 className="text-sm font-bold text-gray-600">Assign to className</h1>
                         <div className="mt-5">
-                                <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a className Session</label>
-                                <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
-                                    <option>Choose a class section</option>
-                                    {classSections.length > 0 ? classSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
-                                </select>
-                            </div>
+                            <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a className Session</label>
+                            <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
+                                <option>Choose a class section</option>
+                                {classSections.length > 0 ? classSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="col-span-2 mt-8">
