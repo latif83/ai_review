@@ -48,37 +48,13 @@ export default function ViewStudentComment({ params }) {
   const [aLoading, setALoading] = useState(false);
   const [commentId, setCommentId] = useState();
 
-  const ApproveComment = async () => {
-    setALoading(true);
-    try {
-      const response = await fetch(`/api/students/${studentId}/comments`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approvedBy: "Management", commentId }),
-      });
-
-      const responseData = await response.json();
-      if (!response.ok) {
-        toast.error(responseData.message);
-        return;
-      }
-
-      toast.success(responseData.message);
-      setFetchData(true);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setALoading(false);
-    }
-  };
-
   const [viewComment,setViewComment] = useState(false)
   const [commentData,setCommentData] = useState()
 
   return (
     <div className="px-5 py-5">
 
-      {viewComment && <ViewComment setViewComment={setViewComment} comment={commentData} />}
+      {viewComment && <ViewComment setViewComment={setViewComment} comment={commentData} studentId={studentId} />}
       <div className="mb-5 flex justify-between items-center">
         <div
           className="

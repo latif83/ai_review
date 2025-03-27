@@ -1,6 +1,15 @@
-export const ViewComment = ({ setViewComment, comment }) => {
+import { useState } from "react";
+import { ApproveComments } from "./approveComment";
+
+export const ViewComment = ({ setViewComment, comment, studentId }) => {
+
+  const [approveComment, setApproveComment] = useState(false);
+
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
+      {approveComment && (
+        <ApproveComments setApproveComment={setApproveComment} commentId={comment.id} studentId={studentId} />
+      )}
       <div className="max-w-4xl relative transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
         <div className="flex justify-between items-center">
           <h1 className="font-medium">View Comment</h1>
@@ -58,6 +67,7 @@ export const ViewComment = ({ setViewComment, comment }) => {
               {!comment.ApprovedBy && (
                 <>
                   <button
+                  onClick={()=>setApproveComment(true)}
                     type="button"
                     className="bg-lime-600 hover:bg-lime-800 text-white p-2 rounded-md flex gap-1.5 items-center text-sm"
                   >
