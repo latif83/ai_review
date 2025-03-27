@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { ViewComment } from "./viewComment";
 
 export default function ViewStudentComment({ params }) {
   const router = useRouter();
@@ -71,8 +72,13 @@ export default function ViewStudentComment({ params }) {
     }
   };
 
+  const [viewComment,setViewComment] = useState(false)
+  const [commentData,setCommentData] = useState()
+
   return (
     <div className="px-5 py-5">
+
+      {viewComment && <ViewComment setViewComment={setViewComment} comment={commentData} />}
       <div className="mb-5 flex justify-between items-center">
         <div
           className="
@@ -129,7 +135,11 @@ export default function ViewStudentComment({ params }) {
           {comments.map((comment, index) => (
             <div
               key={index}
-              className="bg-indigo-800 rounded-md border-indigo-600 p-3"
+              className="bg-indigo-800 hover:bg-cyan-800 cursor-pointer transition duration-500 rounded-md border-indigo-600 p-3"
+              onClick={()=>{
+                setCommentData(comment)
+                setViewComment(true)
+              }}
             >
               <div className="flex justify-between text-gray-100 text-sm">
                 <h2 className="font-bold">{comment.academicYr}</h2>
@@ -141,8 +151,10 @@ export default function ViewStudentComment({ params }) {
                 </h2>
               </div>
 
-              <div className="text-white text-sm mb-5 border-b pb-3">
-                <p>{comment.comment}</p>
+              <div className="text-white text-sm mb-5 pb-3 border-b">
+                <p className={`overflow-hidden line-clamp-2`}>
+                  {comment.comment}
+                </p>
               </div>
 
               <div className="flex justify-between text-gray-100 text-sm">
@@ -155,6 +167,8 @@ export default function ViewStudentComment({ params }) {
                     : "N/A"}{" "}
                 </div>
               </div>
+
+              {/*
 
               {!comment.ApprovedBy && (
                 <div className="flex justify-between items-center mt-1">
@@ -169,7 +183,7 @@ export default function ViewStudentComment({ params }) {
                     Approve
                   </button>
                 </div>
-              )}
+              )} */}
             </div>
           ))}
         </div>
