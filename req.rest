@@ -73,3 +73,6 @@ http://localhost:3000/api/classes/sections/cm7n3pg32000c89949of41yy5
 
 ###
 http://localhost:3000/api/summary
+
+###
+http://localhost:3000/api/students/data/cm7kra6id00008uq38x7uhzmp

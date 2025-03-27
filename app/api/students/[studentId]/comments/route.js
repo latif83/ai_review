@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 export async function GET(req, { params }) {
   try {
-    const { studentId } = params;
+    const { studentId } =  await params;
 
     // Convert studentId to integer
     const studentIdInt = parseInt(studentId);
