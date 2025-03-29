@@ -47,6 +47,7 @@ body {
   position: fixed;
   bottom: 0;
   right: 0;
+  z-index: 99999999999999999;
 }
 
 .goog-te-gadget-simple a {
