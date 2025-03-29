@@ -38,7 +38,7 @@ export default function StudentComment({ params }) {
     setClassName(localStorage.getItem("className"));
 
     const getStudentRecentComments = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         const response = await fetch(`/api/students/${studentId}/comments`);
 
@@ -69,13 +69,12 @@ export default function StudentComment({ params }) {
 
     if (fetchData) {
       getStudentRecentComments();
-      setFetchData(false)
+      setFetchData(false);
     }
-
   }, [fetchData]);
 
-  const [editComment,setEditComment] = useState(false)
-  const [comment,setComment] = useState()
+  const [editComment, setEditComment] = useState(false);
+  const [comment, setComment] = useState();
 
   return (
     <div>
@@ -90,7 +89,14 @@ export default function StudentComment({ params }) {
         />
       )}
 
-      {editComment && <EditComment setEditComment={setEditComment} comment={comment} studentId={studentId} setFC={setFetchData} /> }
+      {editComment && (
+        <EditComment
+          setEditComment={setEditComment}
+          comment={comment}
+          studentId={studentId}
+          setFC={setFetchData}
+        />
+      )}
       <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
@@ -105,7 +111,7 @@ export default function StudentComment({ params }) {
         </div>
         <div className="text-right">
           <button
-          onClick={()=>router.replace('/')}
+            onClick={() => router.replace("/")}
             type="button"
             className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm"
           >
@@ -126,9 +132,7 @@ export default function StudentComment({ params }) {
 
             <span>Log Out</span>
           </button>
-          <p className="text-sm">
-            Please view and generate new comments.
-          </p>
+          <p className="text-sm">Please view and generate new comments.</p>
         </div>
       </div>
 
@@ -189,60 +193,70 @@ export default function StudentComment({ params }) {
           </div>
 
           <div className="grid grid-cols-2 mt-5 gap-5">
-            {loading ? [1,2,3,4,5,6,7,8].map((num,index)=>(<div
-                key={index}
-                className="animate-pulse bg-gray-50 rounded-md border-indigo-600 p-3"
-              >
-                <div className="flex justify-between text-gray-100 text-sm">
-                  <h2 className="font-bold h-5 w-16 bg-gray-200 rounded"></h2>
+            {loading ? (
+              [1, 2, 3, 4, 5, 6, 7, 8].map((num, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse bg-gray-50 rounded-md border-indigo-600 p-3"
+                >
+                  <div className="flex justify-between text-gray-100 text-sm">
+                    <h2 className="font-bold h-5 w-16 bg-gray-200 rounded"></h2>
 
-                  <h2 className="font-bold mb-5 h-5 w-16 bg-gray-200 rounded">
-                    
-                  </h2>
-                </div>
+                    <h2 className="font-bold mb-5 h-5 w-16 bg-gray-200 rounded"></h2>
+                  </div>
 
-                <div className="text-white text-sm mb-5 border-b pb-3">
-                  <p className="h-10 bg-gray-200 rounded"></p>
-                </div>
+                  <div className="text-white text-sm mb-5 border-b pb-3">
+                    <p className="h-10 bg-gray-200 rounded"></p>
+                  </div>
 
-                <div className="flex justify-between text-gray-100 text-sm">
-                  <div className="h-5 w-16 bg-gray-200 rounded">  </div>
+                  <div className="flex justify-between text-gray-100 text-sm">
+                    <div className="h-5 w-16 bg-gray-200 rounded"> </div>
 
-                  <div className="h-5 w-16 bg-gray-200 rounded">
+                    <div className="h-5 w-16 bg-gray-200 rounded"></div>
                   </div>
                 </div>
-              </div>)) : comments.length > 0 ? comments.map((comment, index) => (
-              <div
-              onClick={()=>{
-                setComment(comment)
-                setEditComment(true)
-              }}
-                key={index}
-                className="bg-indigo-800 rounded-md border-indigo-600 p-3"
-              >
-                <div className="flex justify-between text-gray-100 text-sm">
-                  <h2 className="font-bold">{comment.academicYr}</h2>
+              ))
+            ) : comments.length > 0 ? (
+              comments.map((comment, index) => (
+                <div
+                  onClick={() => {
+                    setComment(comment);
+                    setEditComment(true);
+                  }}
+                  key={index}
+                  className="bg-indigo-800 rounded-md border-indigo-600 p-3"
+                >
+                  <div className="flex justify-between text-gray-100 text-sm">
+                    <h2 className="font-bold">{comment.academicYr}</h2>
 
-                  <h2 className="font-bold mb-5">
-                    {comment.academicTerm == "1st" ? `${comment.academicTerm} Term` : comment.academicTerm }
-                  </h2>
-                </div>
+                    <h2 className="font-bold mb-5">
+                      {comment.academicTerm == "1st"
+                        ? `${comment.academicTerm} Term`
+                        : comment.academicTerm}
+                    </h2>
+                  </div>
 
-                <div className="text-white text-sm mb-5 border-b pb-3">
-                  <p>{comment.comment}</p>
-                </div>
+                  <div className="text-white text-sm mb-5 border-b pb-3">
+                    <p>{comment.comment}</p>
+                  </div>
 
-                <div className="flex justify-between text-gray-100 text-sm">
-                  <div> By: {comment.by ? comment.by : "N/A"} </div>
+                  <div className="flex justify-between text-gray-100 text-sm">
+                    <div> By: {comment.by ? comment.by : "N/A"} </div>
 
-                  <div>
-                    {" "}
-                    Approved By:{" "}
-                    {comment.ApprovedBy ? comment.ApprovedBy : "N/A"}{" "}
+                    <div>
+                      {" "}
+                      Approved By:{" "}
+                      {comment.ApprovedBy ? comment.ApprovedBy : "N/A"}{" "}
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="sm:col-span-2 text-center font-semibold">
+                {" "}
+                <p> No Comments found for this student. </p>{" "}
               </div>
-            )) : <div className="sm:col-span-2 text-center font-semibold"> <p> No Comments found for this student. </p> </div>}
+            )}
           </div>
         </div>
       </div>
