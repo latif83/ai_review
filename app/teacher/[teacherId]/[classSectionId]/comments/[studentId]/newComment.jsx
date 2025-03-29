@@ -29,7 +29,9 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                         { role: "system", content: "You are a helpful assistant for teachers. Always return valid JSON arrays." },
                         {
                             role: "user",
-                            content: `Based on the student's previous comments for student with name ${studentName}: "${previousComments}", generate 5 multiple-choice questions for the teacher to assess the student's progress. 
+                            content: `Based on the student's previous comments for student with name ${studentName}: "${previousComments}", generate 5 multiple-choice questions for the teacher to assess the student's progress. first 2 questions should not be related to the previous comments, it should be new general questions out of context of the previous comments to know how the student is doing generally, the next 3 should be from the previous comments. Please if the previous comments are empty, please ask general 5 questions for the student about his/her progress in class, these questions are answered by the teacher about the student whose name ${studentName} to generate assessment, and please use words like your,you've referring to the teachers class.
+
+                            i also have complains the questions are similar, please try to bring some uniqueness in each question.
                             
                             - Each question should have 4 **detailed** answer choices.
                             - **Return the response as a plain JSON array, without any introductory text, explanation, or extra formatting.**
@@ -131,6 +133,14 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
         setLoading(true);
         try {
             const selectedAnswersText = Object.values(answers).join(", ");
+
+            // Check if selectedAnswersText is empty
+            if (!selectedAnswersText.trim()) {
+                toast.error("Please select at least one answer before proceeding.");
+                setLoading(false);
+                return;
+            }
+
             const response = await fetch(OPENROUTER_API_URL, {
                 method: "POST",
                 headers: {
@@ -186,22 +196,22 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
         setLoading(false);
     };
 
-    const [sLoading,setSLoading] = useState(false)
+    const [sLoading, setSLoading] = useState(false)
 
-    const submitComments = async ()=>{
-        try{
+    const submitComments = async () => {
+        try {
 
             setSLoading(true)
-            const response = await fetch(`/api/students/${studentId}/comments`,{
+            const response = await fetch(`/api/students/${studentId}/comments`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({studentId,comment:generatedComment,by:teacherName}),
+                body: JSON.stringify({ studentId, comment: generatedComment, by: teacherName }),
             })
 
             const responseData = await response.json()
-            if(!response.ok){
+            if (!response.ok) {
                 toast.error(responseData.message)
                 return
             }
@@ -210,9 +220,9 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
             setFetchData(true)
             setNewComment(false)
         }
-        catch(e){
+        catch (e) {
             console.log(e)
-        } finally{
+        } finally {
             setSLoading(false)
         }
     }
@@ -224,7 +234,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                     <h1 className="font-medium">
                         Generate New Comment
                     </h1>
-                    <button onClick={()=>setNewComment(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
+                    <button onClick={() => setNewComment(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -276,7 +286,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                     <div className="flex items-center justify-between mt-2 gap-2 p-4 bg-gray-100 rounded-md text-xs">
                         <p>Do the generated questions seem out of context? Would you like to regenerate them?</p>
                         <button
-                        disabled={loading}
+                            disabled={loading}
                             className="px-4 py-2 bg-blue-600 disabled:bg-blue-300 flex items-center justify-center gap-2 text-white rounded-md hover:bg-blue-700"
                             onClick={fetchQuestions} // Ensure fetchQuestions is defined and working
                         >
@@ -378,34 +388,34 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                         <h3 className="font-medium">Generated Comment:</h3>
                         <p className="text-gray-700 text-sm">{generatedComment}</p>
 
-                        <button onClick={()=>submitComments()} type="button" className="flex items-center justify-center gap-2 bg-black disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
-                        {sLoading ? (
-                            <>
-                                <svg
-                                    className="w-5 h-5 animate-spin text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
-                                    ></path>
-                                </svg>
-                                Processing...
-                            </>
-                        ) : (
-                            <span>Submit Generated Comment for Approval!</span>
-                        )}
+                        <button onClick={() => submitComments()} type="button" className="flex items-center justify-center gap-2 bg-black disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
+                            {sLoading ? (
+                                <>
+                                    <svg
+                                        className="w-5 h-5 animate-spin text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
+                                        ></path>
+                                    </svg>
+                                    Processing...
+                                </>
+                            ) : (
+                                <span>Submit Generated Comment for Approval!</span>
+                            )}
                         </button>
                     </div>
                 )}

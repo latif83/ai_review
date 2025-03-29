@@ -120,7 +120,7 @@ export default function StudentComment({ params }) {
             <span>Log Out</span>
           </button>
           <p className="text-sm">
-            Please select a student below to manage comments
+            Please view and generate new comments.
           </p>
         </div>
       </div>
@@ -182,7 +182,29 @@ export default function StudentComment({ params }) {
           </div>
 
           <div className="grid grid-cols-2 mt-5 gap-5">
-            {comments.map((comment, index) => (
+            {loading ? [1,2,3,4,5,6,7,8].map((num,index)=>(<div
+                key={index}
+                className="animate-pulse bg-gray-50 rounded-md border-indigo-600 p-3"
+              >
+                <div className="flex justify-between text-gray-100 text-sm">
+                  <h2 className="font-bold h-5 w-16 bg-gray-200 rounded"></h2>
+
+                  <h2 className="font-bold mb-5 h-5 w-16 bg-gray-200 rounded">
+                    
+                  </h2>
+                </div>
+
+                <div className="text-white text-sm mb-5 border-b pb-3">
+                  <p className="h-10 bg-gray-200 rounded"></p>
+                </div>
+
+                <div className="flex justify-between text-gray-100 text-sm">
+                  <div className="h-5 w-16 bg-gray-200 rounded">  </div>
+
+                  <div className="h-5 w-16 bg-gray-200 rounded">
+                  </div>
+                </div>
+              </div>)) : comments.length > 0 ? comments.map((comment, index) => (
               <div
                 key={index}
                 className="bg-indigo-800 rounded-md border-indigo-600 p-3"
@@ -209,7 +231,7 @@ export default function StudentComment({ params }) {
                   </div>
                 </div>
               </div>
-            ))}
+            )) : <div className="sm:col-span-2 text-center font-semibold"> <p> No Comments found for this student. </p> </div>}
           </div>
         </div>
       </div>
