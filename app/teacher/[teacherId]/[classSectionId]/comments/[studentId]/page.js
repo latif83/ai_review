@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { NewComment } from "./newComment";
+import { EditComment } from "@/app/admin/comments/[studentId]/editComment";
 
 export default function StudentComment({ params }) {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function StudentComment({ params }) {
     setClassName(localStorage.getItem("className"));
 
     const getStudentRecentComments = async () => {
+      setLoading(true)
       try {
         const response = await fetch(`/api/students/${studentId}/comments`);
 
@@ -72,6 +74,9 @@ export default function StudentComment({ params }) {
 
   }, [fetchData]);
 
+  const [editComment,setEditComment] = useState(false)
+  const [comment,setComment] = useState()
+
   return (
     <div>
       {newComment && (
@@ -84,6 +89,8 @@ export default function StudentComment({ params }) {
           setFetchData={setFetchData}
         />
       )}
+
+      {editComment && <EditComment setEditComment={setEditComment} comment={comment} studentId={studentId} setFC={setFetchData} /> }
       <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
@@ -206,6 +213,10 @@ export default function StudentComment({ params }) {
                 </div>
               </div>)) : comments.length > 0 ? comments.map((comment, index) => (
               <div
+              onClick={()=>{
+                setComment(comment)
+                setEditComment(true)
+              }}
                 key={index}
                 className="bg-indigo-800 rounded-md border-indigo-600 p-3"
               >
