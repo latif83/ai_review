@@ -5,8 +5,8 @@ import { useSidebar } from "@/providers/sidebarProvider"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-// import { Logout } from "./logout"
 import { useState } from "react"
+import { LogOut } from "./logout"
 
 export const AdminSidebar = () => {
 
@@ -20,13 +20,13 @@ export const AdminSidebar = () => {
 
     return (
         <>
-            {/* {logout && <Logout setLogout={setLogout} />} */}
+            {logout && <LogOut setLogout={setLogout} />}
             {openSidebar && <div className="bg-black w-[230px] shrink-0 sticky top-0 h-svh transition duration-1000">
                 <div className="p-3 flex gap-2 justify-center items-center border-b-2 border-dotted" >
                     <Image src={'/logo.png'} width={500} height={500} className="w-[50px] h-auto" alt="logo" />
                     <div className="flex flex-col">
                         <span className="text-xs font-bold text-gray-50">
-                        école
+                            école
                         </span>
                         <span className="text-gray-50 font-bold">
                             RONSARD
@@ -88,7 +88,7 @@ export const AdminSidebar = () => {
                 </div>
 
                 <div className="px-5 absolute bottom-2 w-full left-0">
-                    <button type="button" onClick={() => router.replace('/')} className="bg-red-200 hover:bg-red-600 hover:text-white transition duration-500 rounded p-2 py-4 w-full text-sm flex items-center justify-center gap-1.5">
+                    <button type="button" onClick={() => setLogout(true)} className="bg-red-200 hover:bg-red-600 hover:text-white transition duration-500 rounded p-2 py-4 w-full text-sm flex items-center justify-center gap-1.5">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                         </svg>
