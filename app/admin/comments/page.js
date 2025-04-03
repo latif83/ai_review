@@ -1,17 +1,19 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { ExistingCommentsUpload } from "./existingCommentsUpload";
 import { ViewApproveComment } from "./viewApproveComment";
 
 export default function Comments() {
-
-    const [uploadExistingComments,setUploadExistingComments] = useState(false)
-    const [viewComments,setViewComments] = useState(false)
+  const [uploadExistingComments, setUploadExistingComments] = useState(false);
+  const [viewComments, setViewComments] = useState(false);
 
   return (
     <div className="px-5 py-5">
-
-      {uploadExistingComments && <ExistingCommentsUpload setUploadExistingComments={setUploadExistingComments} />}
+      {uploadExistingComments && (
+        <ExistingCommentsUpload
+          setUploadExistingComments={setUploadExistingComments}
+        />
+      )}
 
       {viewComments && <ViewApproveComment setViewComments={setViewComments} />}
 
@@ -44,7 +46,7 @@ flex items-center gap-2"
 
         <div className="mt-3 flex gap-4">
           <button
-          onClick={()=>setUploadExistingComments(true)}
+            onClick={() => setUploadExistingComments(true)}
             type="button"
             className="p-2 text-sm bg-indigo-600 hover:bg-indigo-800 text-white rounded-md flex items-center justify-center gap-2"
           >
@@ -67,16 +69,49 @@ flex items-center gap-2"
           </button>
 
           <button
-          onClick={()=>setViewComments(true)}
+            onClick={() => setViewComments(true)}
             type="button"
             className="p-2 text-sm bg-lime-600 hover:bg-lime-800 text-white rounded-md flex items-center justify-center gap-2"
           >
-           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-</svg>
-
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+              />
+            </svg>
 
             <span>View / Approve Comments</span>
+          </button>
+
+          <button
+            onClick={() => setViewComments(true)}
+            type="button"
+            className="p-2 text-sm bg-green-600 hover:bg-green-800 text-white rounded-md flex items-center justify-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
+              />
+            </svg>
+
+            <span>View / Extract Comments</span>
           </button>
         </div>
       </div>
