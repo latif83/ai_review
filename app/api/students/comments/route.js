@@ -31,6 +31,10 @@ export async function POST(req) {
       });
 
       if (!existingComment) {
+        if (!comment.comment) {
+          continue;
+        }
+
         newComments.push({
           studentId: comment.studentId,
           academicYr: comment.academicYr,
@@ -42,25 +46,25 @@ export async function POST(req) {
 
     if (newComments.length > 0) {
       await prisma.comments.createMany({ data: newComments });
+
+      return NextResponse.json(
+        {
+          message: `${newComments.length} new comments uploaded successfully! ${
+            body.comments.length - newComments.length
+          } duplicates found!`,
+          added: newComments.length,
+          skipped: body.comments.length - newComments.length,
+        },
+        { status: 201 }
+      );
     } else {
       return NextResponse.json(
         {
-          message: `All ${body.comments.length} comments are duplicates! No new comments were added.`
+          message: `All ${body.comments.length} comments are duplicates! No new comments were added.`,
         },
         { status: 404 }
       );
     }
-
-    return NextResponse.json(
-      {
-        message: `${newComments.length} new comments uploaded successfully! ${
-          body.comments.length - newComments.length
-        } duplicates found!`,
-        added: newComments.length,
-        skipped: body.comments.length - newComments.length,
-      },
-      { status: 201 }
-    );
   } catch (error) {
     console.error("Error inserting comments:", error);
     return NextResponse.json(

@@ -24,7 +24,7 @@ export const ExistingCommentsUpload = ({ setUploadExistingComments }) => {
       const workbook = XLSX.read(binaryStr, { type: "binary" });
 
       // Assume the first sheet contains the comments
-      const sheetName = workbook.SheetNames[1];
+      const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
 
       // Convert sheet data to JSON
@@ -33,11 +33,11 @@ export const ExistingCommentsUpload = ({ setUploadExistingComments }) => {
       const formattedData = rawData.map((row) => ({
         academicYr: row["ACA YEAR"], // Adjust column names
         academicTerm: row["TERM"],
-        comment: row["SKILLS ASSESSEMENT"],
+        comment: row["TEACHERS COMMENT"],
         studentId: row["STUDENT ID"],
       }));
 
-      //   console.log("Formatted Data:", formattedData);
+        console.log("Formatted Data:", formattedData);
 
       setExtractedData({ comments: formattedData });
     };
