@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ExistingCommentsUpload } from "./existingCommentsUpload";
 import { ViewApproveComment } from "./viewApproveComment";
+import Link from "next/link";
 
 export default function Comments() {
   const [uploadExistingComments, setUploadExistingComments] = useState(false);
@@ -91,9 +92,8 @@ flex items-center gap-2"
             <span>View / Approve Comments</span>
           </button>
 
-          <button
-            onClick={() => setViewComments(true)}
-            type="button"
+          <Link
+            href="/admin/comments/extractComments"
             className="p-2 text-sm bg-green-600 hover:bg-green-800 text-white rounded-md flex items-center justify-center gap-2"
           >
             <svg
@@ -112,7 +112,7 @@ flex items-center gap-2"
             </svg>
 
             <span>View / Extract Comments</span>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

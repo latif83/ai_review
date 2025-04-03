@@ -76,3 +76,6 @@ http://localhost:3000/api/summary
 
 ###
 http://localhost:3000/api/students/data/cm7kra6id00008uq38x7uhzmp
+
+###
+http://localhost:3000/api/classes/getComments/cm7kwhsjf0000wxp7ik34jhm1
