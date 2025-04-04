@@ -31,6 +31,7 @@ model Classes {
 
   // Define relation to class sections
   ClassSections ClassSections[]
+  UploadExcel   UploadExcel[]
 }
 
 // ClassSections model
@@ -88,8 +89,21 @@ model Comments {
   academicYr   String?
   academicTerm String?
   comment      String
-  by String?
-  ApprovedBy String?
+  by           String?
+  ApprovedBy   String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// Upload Excel Model
+model UploadExcel {
+  id           String   @id @default(cuid())
+  fileUrl      String
+  classId      String
+  academicTerm String
+  academicYr   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  Class Classes @relation(fields: [classId], references: [id])
 }

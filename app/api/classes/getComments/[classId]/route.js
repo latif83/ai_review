@@ -12,10 +12,10 @@ export async function GET(req, { params }) {
     const { classId } = await params;
 
     const classDetails = await prisma.Classes.findUnique({
-        where : {
-            id : classId
-        }
-    })
+      where: {
+        id: classId,
+      },
+    });
 
     // Fetch students belonging to the given class
     const students = await prisma.students.findMany({
@@ -42,8 +42,17 @@ export async function GET(req, { params }) {
           in: studentIds,
         }, // Fetch comments where studentId matches
       },
-      select: { studentId: true, comment: true },
+      select: { studentId: true, comment: true, ApprovedBy: true },
     });
+
+    const checkExcelFileUpload = await prisma.UploadExcel.findMany({
+      where: {
+        academicYr: "2024/2025",
+        academicTerm: "Term 2",
+      },
+    });
+
+    const fileUploaded = checkExcelFileUpload ? true : false;
 
     // Map comments to respective students
     const studentsWithComments = students.map((student) => ({
@@ -51,9 +60,19 @@ export async function GET(req, { params }) {
       comment:
         comments.find((comment) => comment.studentId === student.studentId)
           ?.comment || null, // Get the comment or null if not found
+      ApprovedBy:
+        comments.find((comment) => comment.studentId === student.studentId)
+          ?.ApprovedBy || null,
     }));
 
-    return NextResponse.json({students:studentsWithComments,className:classDetails.className}, { status: 200 });
+    return NextResponse.json(
+      {
+        students: studentsWithComments,
+        className: classDetails.className,
+        fileUploaded,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching students and comments:", error);
     return NextResponse.json(

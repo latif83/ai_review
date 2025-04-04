@@ -2,6 +2,8 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { UploadExcel } from "./uploadExcel";
+import { DownloadExcel } from "./downloadExcel";
 
 export default function StudentsClassCommentDetails({ params }) {
   const [loading, setLoading] = useState(true);
@@ -9,11 +11,13 @@ export default function StudentsClassCommentDetails({ params }) {
 
   const [commentData, setCommentData] = useState([]);
 
-  const [className,setClassName] = useState("")
+  const [className, setClassName] = useState("");
 
-  const [fileUploaded, setFileUploaded] = useState(true);
+  const [fileUploaded, setFileUploaded] = useState(false);
 
-  const router = useRouter()
+  const router = useRouter();
+
+  const [upload, setUpload] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -27,7 +31,8 @@ export default function StudentsClassCommentDetails({ params }) {
         }
 
         setCommentData(responseData.students);
-        setClassName(responseData.className)
+        setClassName(responseData.className);
+        setFileUploaded(responseData.fileUploaded);
       } catch (e) {
         console.log(e);
         toast.error("Internal server error!");
@@ -41,12 +46,25 @@ export default function StudentsClassCommentDetails({ params }) {
 
   return (
     <div className="px-5 py-5">
+      {upload && (
+        <UploadExcel
+          setUpload={setUpload}
+          studentsComments={commentData}
+        />
+      )}
+
       <div className="flex justify-between items-center gap-2">
         <div>
-          <h1 className="font-medium">{loading ? <span className="w-32 block mb-1 h-5 rounded-md bg-gray-100 animate-pulse p-2"></span> : className}</h1>
+          <h1 className="font-medium">
+            {loading ? (
+              <span className="w-32 block mb-1 h-5 rounded-md bg-gray-100 animate-pulse p-2"></span>
+            ) : (
+              className
+            )}
+          </h1>
           <p className="text-xs">View / Extract comments</p>
           <button
-          onClick={()=>router.back()}
+            onClick={() => router.back()}
             type="button"
             className="flex items-center justify-center gap-1.5 p-2 rounded-md bg-red-200 hover:bg-red-700 hover:text-white transition duration-500 text-xs mt-1"
           >
@@ -70,8 +88,9 @@ export default function StudentsClassCommentDetails({ params }) {
         </div>
 
         <div className="flex gap-2">
-          <div>
+          {/* <div>
             <button
+              onClick={() => setUpload(true)}
               type="button"
               className="p-2 rounded-md bg-lime-700 text-white flex items-center justify-center hover:bg-green-700 transition duration-500 text-sm gap-1.5"
             >
@@ -92,17 +111,18 @@ export default function StudentsClassCommentDetails({ params }) {
               <span>Upload Excel</span>
             </button>
 
-            {fileUploaded && (
+            {loading ? <p className="bg-gray-200 rounded-md mt-1 h-2 animate-pulse"> </p> : fileUploaded && (
               <p className="text-xs text-green-700 font-medium text-center">
                 ✅ File Uploaded
               </p>
             )}
-          </div>
+          </div> */}
 
           <div>
             <button
+              onClick={() => setUpload(true)}
               type="button"
-              className="p-2 rounded-md bg-cyan-700 text-white flex items-center justify-center hover:bg-blue-700 transition duration-500 text-sm gap-1.5"
+              className="p-2 rounded-md bg-lime-700 text-white flex items-center justify-center hover:bg-green-700 transition duration-500 text-sm gap-1.5"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +139,7 @@ export default function StudentsClassCommentDetails({ params }) {
                 />
               </svg>
 
-              <span>Download Excel</span>
+              <span>Extract Comment</span>
             </button>
           </div>
         </div>
@@ -176,7 +196,7 @@ export default function StudentsClassCommentDetails({ params }) {
                   <td className="px-6 py-4">
                     {data.comment ? data.comment : "N/A"}
                   </td>
-                  <td className="px-6 py-4">Approved</td>
+                  <td className="px-6 py-4">{data.ApprovedBy ? <span className="text-lime-700 font-medium"> Approved</span> : <span className="text-red-700 font-medium"> Not Approved</span>}</td>
                 </tr>
               ))
             ) : (
