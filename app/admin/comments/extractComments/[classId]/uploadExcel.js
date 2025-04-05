@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { v4 } from "uuid";
 import * as XLSX from "xlsx";
 
-export const UploadExcel = ({ setUpload,studentsComments }) => {
+export const UploadExcel = ({ setUpload,studentsComments,className }) => {
   const [loading, setLoading] = useState(false);
 
   const [file, setFile] = useState(null);
@@ -67,7 +67,7 @@ export const UploadExcel = ({ setUpload,studentsComments }) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "Updated_Student_Comments.xlsx";
+        a.download = `${className}.xlsx`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

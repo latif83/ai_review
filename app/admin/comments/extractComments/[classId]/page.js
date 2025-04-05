@@ -50,6 +50,7 @@ export default function StudentsClassCommentDetails({ params }) {
         <UploadExcel
           setUpload={setUpload}
           studentsComments={commentData}
+          className={className}
         />
       )}
 
