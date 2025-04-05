@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { NewComment } from "./newComment";
 import { EditComment } from "@/app/admin/comments/[studentId]/editComment";
+import { LogOut } from "@/components/logout";
 
 export default function StudentComment({ params }) {
   const router = useRouter();
@@ -76,8 +77,12 @@ export default function StudentComment({ params }) {
   const [editComment, setEditComment] = useState(false);
   const [comment, setComment] = useState();
 
+  const [logout, setLogout] = useState(false);
+
   return (
     <div>
+      {logout && <LogOut setLogout={setLogout} />}
+
       {newComment && (
         <NewComment
           previousComments={previousComments}
@@ -111,7 +116,7 @@ export default function StudentComment({ params }) {
         </div>
         <div className="text-right">
           <button
-            onClick={() => router.replace("/")}
+            onClick={() => setLogout(true)}
             type="button"
             className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm"
           >

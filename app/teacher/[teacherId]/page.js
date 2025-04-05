@@ -1,4 +1,5 @@
 "use client";
+import { LogOut } from "@/components/logout";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
@@ -50,8 +51,11 @@ export default function TeachersDashboard({ params }) {
     getAssignedClassSections();
   }, []);
 
+  const [logout,setLogout] = useState(false)
+
   return (
     <div>
+      {logout && <LogOut setLogout={setLogout} />}
       <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
@@ -66,7 +70,7 @@ export default function TeachersDashboard({ params }) {
         </div>
         <div className="text-right">
           <button
-          onClick={()=>router.replace('/')}
+          onClick={()=>setLogout(true)}
             type="button"
             className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm"
           >

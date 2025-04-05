@@ -82,7 +82,7 @@ export async function POST(req) {
       return NextResponse.json(
         {
           token,
-          message: "Login successful",
+          message: "Login successful!",
           roleIs,
           identity: user.id,
           user: user?.name ? user?.name : `${user.firstName} ${user.lastName}`,

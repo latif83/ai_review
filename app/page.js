@@ -1,4 +1,5 @@
 "use client";
+import { ResetPassword } from "@/components/resetPassword";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +15,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+
+  const [resetPassword, setResetPassword] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const Login = async (e) => {
     try {
@@ -32,7 +37,12 @@ export default function Home() {
 
       if (!response.ok) {
         toast.error(responseData.message);
-        return
+        return;
+      }
+
+      if (responseData.resetPasswordRequired) {
+        setResetPassword(true);
+        return;
       }
 
       localStorage.setItem("identity", responseData.identity);
@@ -41,8 +51,9 @@ export default function Home() {
 
       toast.success(responseData.message);
 
-      responseData.roleIs == "admin" ? router.push(responseData.roleIs) : router.push(`${responseData.roleIs}/${responseData.identity}`);
-      
+      responseData.roleIs == "admin"
+        ? router.push(responseData.roleIs)
+        : router.push(`${responseData.roleIs}/${responseData.identity}`);
     } catch (e) {
       console.log(e);
     } finally {
@@ -52,6 +63,13 @@ export default function Home() {
 
   return (
     <div className="flex bg-[url('/bg.png')] bg-cover bg-center min-h-svh flex-col justify-center px-6 py-12 lg:px-8">
+      {resetPassword && (
+        <ResetPassword
+          setResetPassword={setResetPassword}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
       <div className="sm:mx-auto sm:w-full bg-white/70 sm:max-w-sm border border-black rounded-md overflow-hidden">
         <div className="bg-black p-3 py-5 flex gap-2 text-white justify-between items-center">
           <div className="flex gap-2">
@@ -120,7 +138,7 @@ export default function Home() {
             </div>
             <div className="mt-2">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 autoComplete="current-password"
@@ -135,6 +153,15 @@ export default function Home() {
                   }))
                 }
               />
+            </div>
+            <div className="flex items-center gap-2 text-sm mt-1">
+              <input
+                type="checkbox"
+                id="showPassword"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+              />
+              <label htmlFor="showPassword">Show password</label>
             </div>
           </div>
 
