@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-export const AssignTeacher = ({ setAssignTeacher, sectionData }) => {
+export const AssignTeacher = ({ setAssignTeacher, classData }) => {
     const [search, setSearch] = useState("");
 
     const [loadingTeachers, setLoadingTeachers] = useState(false)
@@ -23,7 +23,7 @@ export const AssignTeacher = ({ setAssignTeacher, sectionData }) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ teacherId, sectionId: sectionData.sectionId }),
+                body: JSON.stringify({ teacherId, classId: classData.classId }),
             });
             const responseData = await response.json();
 
@@ -74,7 +74,7 @@ export const AssignTeacher = ({ setAssignTeacher, sectionData }) => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-4">
                     <div>
-                        <span className="font-bold text-red-600 text-xs">{`${sectionData.className} (${sectionData.sectionName})`}</span>
+                        <span className="font-bold text-red-600 text-xs">{`${classData.className}`}</span>
                         <h1 className="font-medium text-sm">Assign Teacher</h1>
                     </div>
                     <button

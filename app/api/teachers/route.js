@@ -58,12 +58,7 @@ export async function GET(req) {
         id: true,
         firstName: true,
         lastName: true,
-        email: true,
-        classSections: {
-          select: {
-            sectionName: true, // Fetch class section name
-          },
-        },
+        email: true
       },
     });
 
