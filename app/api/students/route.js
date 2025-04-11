@@ -10,11 +10,11 @@ export const dynamic = "force-dynamic";
 export async function POST(req) {
   try {
     // Parse request body for student data
-    const { studentId, fName, lName, classId, classSectionsId } =
+    const { studentId, fName, lName, classId } =
       await req.json();
 
     // Check if required fields are provided
-    if (!fName || !lName || !studentId || !classId || !classSectionsId) {
+    if (!fName || !lName || !studentId || !classId) {
       return NextResponse.json(
         {
           message: "Missing required fields!",
@@ -23,14 +23,25 @@ export async function POST(req) {
       );
     }
 
+        // Check if a student with the same studentId already exists
+        const existingStudent = await prisma.students.findUnique({
+          where: { studentId },
+        });
+    
+        if (existingStudent) {
+          return NextResponse.json(
+            { message: "A student with this ID already exists!" },
+            { status: 409 }
+          );
+        }
+
     // Create the new student in the database
     await prisma.students.create({
       data: {
         studentId,
         fName,
         lName,
-        classId,
-        classSectionsId,
+        classId
       },
     });
 
@@ -65,17 +76,11 @@ export async function GET(req) {
         fName: true,
         lName: true,
         classId: true,
-        classSectionsId: true,
         class: {
           select: {
             className: true, // Fetch class name
           },
-        },
-        ClassSections: {
-          select: {
-            sectionName: true, // Fetch class section name
-          },
-        },
+        }
       },
     });
 
@@ -94,7 +99,7 @@ export async function GET(req) {
 export async function PUT(req) {
   try {
     // Parse request body for updated student data
-    const { studentId, fName, lName, classId, classSectionsId } =
+    const { studentId, fName, lName, classId } =
       await req.json();
 
     // Check if studentId is provided
@@ -123,8 +128,7 @@ export async function PUT(req) {
       data: {
         fName: fName || existingStudent.fName,
         lName: lName || existingStudent.lName,
-        classId: classId || existingStudent.classId,
-        classSectionsId: classSectionsId || existingStudent.classSectionsId,
+        classId: classId || existingStudent.classId
       },
     });
 

@@ -7,45 +7,11 @@ export const NewStudent = ({ setAddStudent, setFetchData, classId }) => {
         fName: "",
         lName: "",
         studentId: "",
-        classId,
-        classSectionsId: ""
+        classId
     })
 
     const [loading, setLoading] = useState(false)
 
-    const [classSections, setClassSections] = useState([])
-    const [classSectionsLoading, setClassSectionsLoading] = useState(false)
-
-    const [fecthSectionData, setFetchSectionData] = useState(true)
-
-    useEffect(() => {
-
-        const getClassSections = async () => {
-            setClassSectionsLoading(true)
-            try {
-                const response = await fetch(`/api/classes/${classId}`)
-                const responseData = await response.json()
-                if (!response.ok) {
-                    // Error here
-                    toast.error(responseData.message)
-                    return
-                }
-
-                setClassSections(responseData.classSections)
-
-
-            } catch (e) {
-                console.log(e)
-            } finally {
-                setClassSectionsLoading(false)
-            }
-        }
-
-        if (fecthSectionData) {
-            getClassSections()
-            setFetchSectionData(false)
-        }
-    }, [fecthSectionData])
 
     const submitStudentData = async (e) => {
         e.preventDefault()
@@ -59,12 +25,12 @@ export const NewStudent = ({ setAddStudent, setFetchData, classId }) => {
                 body: JSON.stringify(formData),
             })
 
+            const responseData = await response.json()
+
             if (!response.ok) {
                 toast.error(responseData.message)
                 return
             }
-
-            const responseData = await response.json()
 
             // success here
 
@@ -109,17 +75,6 @@ export const NewStudent = ({ setAddStudent, setFetchData, classId }) => {
                     <div>
                         <label htmlFor="last_name" className="block mb-2 text-sm font-medium text-gray-900">Last Name</label>
                         <input type="text" id="last_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="New student last name" required value={formData.lName} onChange={(e) => setFormData((prevData) => ({ ...prevData, lName: e.target.value }))} />
-                    </div>
-
-                    <div className="col-span-2 mt-5">
-                        <h1 className="text-sm font-bold text-gray-600">Assign to class section</h1>
-                        <div className="mt-5">
-                            <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a class Section</label>
-                            <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
-                                <option>Choose a class section</option>
-                                {classSections.length > 0 ? classSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
-                            </select>
-                        </div>
                     </div>
 
                     <div className="col-span-2 mt-8">

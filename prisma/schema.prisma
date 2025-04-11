@@ -44,9 +44,6 @@ model ClassSections {
 
   // Define relation to Classes
   class Classes @relation(fields: [classId], references: [id])
-
-  // Define relation to Students
-  students students[]
 }
 
 model students {
@@ -55,13 +52,11 @@ model students {
   fName           String
   lName           String
   classId         String
-  classSectionsId String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   // Define relation to Classes
   class         Classes       @relation(fields: [classId], references: [id], name: "ClassStudents")
-  ClassSections ClassSections @relation(fields: [classSectionsId], references: [id])
 }
 
 // Teachers model

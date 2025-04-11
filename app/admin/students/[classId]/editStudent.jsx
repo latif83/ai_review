@@ -7,42 +7,10 @@ export const EditStudent = ({ setEditStudent, setFetchData, studentData }) => {
         fName: studentData.fName,
         lName: studentData.lName,
         studentId: studentData.studentId,
-        classId: studentData.classId,
-        classSectionsId: studentData.classSectionsId
+        classId: studentData.classId
     })
 
     const [loading, setLoading] = useState(false)
-
-    const [classSections, setClassSections] = useState([])
-    const [classSectionsLoading, setClassSectionsLoading] = useState(false)
-
-    useEffect(() => {
-
-        const getClassSections = async () => {
-            setClassSectionsLoading(true)
-            try {
-                const response = await fetch(`/api/classes/${studentData.classId}`)
-
-                if (!response.ok) {
-                    // Error here
-                    return
-                }
-
-                const responseData = await response.json()
-
-                setClassSections(responseData.classSections)
-
-
-
-            } catch (e) {
-                console.log(e)
-            } finally {
-                setClassSectionsLoading(false)
-            }
-        }
-
-        getClassSections()
-    }, [])
 
     const submitStudentData = async (e) => {
         e.preventDefault()
@@ -108,16 +76,6 @@ export const EditStudent = ({ setEditStudent, setFetchData, studentData }) => {
                         <input type="text" id="last_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="New student last name" required value={formData.lName} onChange={(e) => setFormData((prevData) => ({ ...prevData, lName: e.target.value }))} />
                     </div>
 
-                    <div className="col-span-2 mt-5">
-                        <h1 className="text-sm font-bold text-gray-600">Assign to className</h1>
-                        <div className="mt-5">
-                            <label htmlFor="classSection" className="block mb-2 text-sm font-medium text-gray-900">Select a className Session</label>
-                            <select id="classSection" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value={formData.classSectionsId} onChange={(e) => setFormData((prevData) => ({ ...prevData, classSectionsId: e.target.value }))}>
-                                <option>Choose a class section</option>
-                                {classSections.length > 0 ? classSections.map((section, index) => (<option key={index} value={section.id}>{section.sectionName}</option>)) : <option>Select a class to fetch sections</option>}
-                            </select>
-                        </div>
-                    </div>
 
                     <div className="col-span-2 mt-8">
                         <button

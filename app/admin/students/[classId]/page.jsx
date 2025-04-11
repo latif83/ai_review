@@ -167,7 +167,7 @@ flex items-center gap-2">
                                 {student.studentId}
                             </td>
                             <td className="px-6 py-4">
-                                {`${student.class.className} ( ${student.ClassSections.sectionName} )`}
+                                {`${student.class.className}`}
                             </td>
                             <td className="px-6 py-4">
                                 <button type="button" onClick={() => {

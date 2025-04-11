@@ -32,17 +32,11 @@ export async function GET(req, { params }) {
         fName: true,
         lName: true,
         classId: true,
-        classSectionsId: true,
         class: {
           select: {
             className: true, // Fetch class name
           },
-        },
-        ClassSections: {
-          select: {
-            sectionName: true, // Fetch class section name
-          },
-        },
+        }
       },
     });
 
