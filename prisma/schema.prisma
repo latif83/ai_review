@@ -99,3 +99,12 @@ model UploadExcel {
 
   Class Classes @relation(fields: [classId], references: [id])
 }
+
+// subjects modal
+model subjects {
+  id              String   @id @default(cuid())
+  subjectId       String   @unique
+  name           String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

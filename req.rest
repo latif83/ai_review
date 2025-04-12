@@ -79,3 +79,18 @@ http://localhost:3000/api/students/data/cm7kra6id00008uq38x7uhzmp
 
 ###
 http://localhost:3000/api/classes/getComments/cm7kwhsjf0000wxp7ik34jhm1
+
+###
+http://localhost:3000/api/classes/sections
+
+###
+POST http://localhost:3000/api/subjects
+Content-Type: application/json
+
+{
+     "subjectId" : "codehere",
+     "name" : "ICT"
+}
+
+###
+http://localhost:3000/api/subjects
