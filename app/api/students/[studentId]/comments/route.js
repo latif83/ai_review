@@ -58,7 +58,7 @@ export async function POST(req,{params}){
         // extract body params
         const {comment,by} = await req.json()
 
-        console.log({comment,by})
+        // console.log({comment,by})
 
         const {studentId} = await params
 

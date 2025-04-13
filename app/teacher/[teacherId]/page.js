@@ -152,10 +152,10 @@ export default function TeachersDashboard({ params }) {
             sections.map((section, index) => (
               <Link
                 key={index}
-                href={`/teacher/${teacherId}/${section.classSessionId}`}
+                href={`/teacher/${teacherId}/${section.id}`}
                 className="bg-gray-50 border border-indigo-600 p-2 py-5 rounded-md text-gray-800 hover:bg-indigo-600 hover:text-white transition duration-500 cursor-pointer text-center"
               >
-                <span className="text-sm font-medium">{`${section.className} (${section.classSectionName})`}</span>
+                <span className="text-sm font-medium">{`${section.className}`}</span>
               </Link>
             ))
           ) : (

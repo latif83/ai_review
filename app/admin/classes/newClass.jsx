@@ -4,7 +4,8 @@ import { toast } from "react-toastify"
 export const NewClass = ({ setAddClass, setFetchData }) => {
 
     const [formData, setFormData] = useState({
-        className: ""
+        className: "",
+        subjectBasedComments: false
     })
 
     const [loading, setLoading] = useState(false)
@@ -61,6 +62,24 @@ export const NewClass = ({ setAddClass, setFetchData }) => {
                         <label htmlFor="studentId" className="block mb-2 text-sm font-medium text-gray-900">Class Name</label>
                         <input type="text" id="studentId" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Enter a name for this class...." required value={formData.className} onChange={(e) => setFormData((prevData) => ({ ...prevData, className: e.target.value }))} />
                     </div>
+
+                    <div className="mt-4">
+                        <label className="inline-flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                className="form-checkbox rounded"
+                                checked={formData.subjectBasedComments}
+                                onChange={(e) =>
+                                    setFormData((prevData) => ({
+                                        ...prevData,
+                                        subjectBasedComments: e.target.checked,
+                                    }))
+                                }
+                            />
+                            <span className="text-sm text-gray-700">Enable subject-based comments for this class</span>
+                        </label>
+                    </div>
+
 
                     <div className="flex justify-end mt-8">
                         <button

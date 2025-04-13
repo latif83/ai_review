@@ -25,6 +25,7 @@ model Classes {
   className    String
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+ subjectBasedComments Boolean      @default(false) // ← This marks subject-based comment mode
 
   students     students[]   @relation(name: "ClassStudents")
   ClassSections ClassSections[]
@@ -83,6 +84,7 @@ model Comments {
   comment      String
   by           String?
   ApprovedBy   String?
+  subjectId     String?        // optional relation to Subject
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

@@ -2,14 +2,14 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { EditComment } from "@/app/admin/comments/[studentId]/editComment";
 import { LogOut } from "@/components/logout";
+import { EditComment } from "@/app/admin/comments/[studentId]/editComment";
 import { NewComment } from "./newComment";
 
 export default function StudentComment({ params }) {
   const router = useRouter();
 
-  const { studentId } = use(params);
+  const { studentId, subjectId } = use(params);
 
   const [className, setClassName] = useState("");
 
@@ -27,6 +27,8 @@ export default function StudentComment({ params }) {
 
   const [fetchData, setFetchData] = useState(true);
 
+  const [subjectName,setSubjectName] = useState("")
+
   useEffect(() => {
     if (!localStorage.getItem("identity")) {
       toast.error("Please login to access this page!");
@@ -41,7 +43,7 @@ export default function StudentComment({ params }) {
     const getStudentRecentComments = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/students/${studentId}/comments`);
+        const response = await fetch(`/api/students/${studentId}/comments/${subjectId}`);
 
         const responseData = await response.json();
 
@@ -55,6 +57,8 @@ export default function StudentComment({ params }) {
         );
 
         setComments(responseData.comments);
+
+        setSubjectName(responseData.subject.name)
 
         setPreviousComments(
           Array.isArray(responseData.comments)
@@ -91,17 +95,19 @@ export default function StudentComment({ params }) {
           studentId={studentId}
           teacherName={userIdentity}
           setFetchData={setFetchData}
+          subjectId={subjectId}
+          subjectName={subjectName}
         />
       )}
 
-      {editComment && (
+      {/* {editComment && (
         <EditComment
           setEditComment={setEditComment}
           comment={comment}
           studentId={studentId}
           setFC={setFetchData}
         />
-      )}
+      )} */}
       <div className="py-5 px-12 text-gray-600 flex justify-between items-center">
         <div>
           <h1 className="text-lg font-bold">Welcome to the,</h1>
@@ -164,9 +170,13 @@ export default function StudentComment({ params }) {
             </svg>
           </button>
 
+          <div>
           <p className="text-sm text-gray-400 font-medium">
             {className} / {studentName}
           </p>
+
+          <p className="text-xs"><span className="font-bold">Subject: </span> <span className="font-medium text-red-400">{subjectName}</span> </p>
+          </div>
         </div>
 
         <div>

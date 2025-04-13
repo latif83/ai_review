@@ -10,8 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req) {
   try {
     // Parse request body for class data
-    const { className } =
-      await req.json();
+    const { className, subjectBasedComments } = await req.json();
 
     // Check if required fields are provided
     if (!className) {
@@ -26,7 +25,8 @@ export async function POST(req) {
     // Create the new class in the database
     await prisma.Classes.create({
       data: {
-        className
+        className,
+        subjectBasedComments,
       },
     });
 
@@ -44,27 +44,27 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
-    try {
-      // Parse query parameters
+  try {
+    // Parse query parameters
     //   const { searchParams } = new URL(req.url);
     //   const classId = searchParams.get("classId");
     //   const classSectionsId = searchParams.get("classSectionsId");
-  
-      // Fetch students from the database
-      const classes = await prisma.classes.findMany({
-        select: {
-          id: true,
-          className: true
-        },
-      });
-  
-      // Return the list of students
-      return NextResponse.json({ classes }, { status: 200 });
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      return NextResponse.json(
-        { error: "Internal Server Error" },
-        { status: 500 }
-      );
-    }
+
+    // Fetch students from the database
+    const classes = await prisma.classes.findMany({
+      select: {
+        id: true,
+        className: true,
+      },
+    });
+
+    // Return the list of students
+    return NextResponse.json({ classes }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
+}

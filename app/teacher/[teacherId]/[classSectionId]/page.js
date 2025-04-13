@@ -18,6 +18,8 @@ export default function ClassSection({ params }) {
 
   const [className, setClassName] = useState("");
 
+  const [subjectBasedComments, setSubjectBasedComments] = useState(false);
+
   useEffect(() => {
     if (!localStorage.getItem("identity")) {
       toast.error("Please login to access this page!");
@@ -36,16 +38,13 @@ export default function ClassSection({ params }) {
           return;
         }
 
-        setClassName(
-          `${responseData.classSections.class.className} (${responseData.classSections.sectionName})`
-        );
+        setClassName(responseData.className);
 
-        localStorage.setItem(
-          "className",
-          `${responseData.classSections.class.className} (${responseData.classSections.sectionName})`
-        );
+        localStorage.setItem("className", responseData.className);
 
-        setStudents(responseData.classSections.students);
+        setStudents(responseData.students);
+
+        setSubjectBasedComments(responseData.subjectBasedComments);
       } catch (e) {
         console.log(e);
       } finally {
@@ -56,7 +55,34 @@ export default function ClassSection({ params }) {
     getStudents();
   }, []);
 
-  const [logout,setLogout] = useState(false)
+  const [selectedSubject, setSelectedSubject] = useState();
+  const [subjectsLoading, setSubjectsLoading] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+
+  useEffect(() => {
+    const getSubjects = async () => {
+      try {
+        setSubjectsLoading(true);
+        const res = await fetch(`/api/subjects`);
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.message);
+          return;
+        }
+
+        setSubjects(data.subjects);
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setSubjectsLoading(false);
+      }
+    };
+    if (subjectBasedComments) {
+      getSubjects();
+    }
+  }, [subjectBasedComments]);
+
+  const [logout, setLogout] = useState(false);
 
   return (
     <div>
@@ -75,7 +101,7 @@ export default function ClassSection({ params }) {
         </div>
         <div className="text-right">
           <button
-          onClick={()=>setLogout(true)}
+            onClick={() => setLogout(true)}
             type="button"
             className="border-2 hover:bg-red-600 border-red-600 hover:text-white transition duration-500 inline-flex items-center justify-center gap-2 text-red-600 p-2 rounded-md text-sm"
           >
@@ -129,7 +155,24 @@ export default function ClassSection({ params }) {
         </div>
 
         <h1 className="font-bold mb-2">List of students</h1>
-        <div className="mb-2 w-1/2">
+
+        {subjectBasedComments && (
+          <div className="mb-2 w-1/2">
+            <select
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+              className="block w-full p-2 px-4 text-sm border-2 outline-blue-300 rounded-md"
+            >
+              <option>select subject</option>
+              {subjects.map((subject, index) => (
+                <option key={index} value={subject.id}>
+                  {subject.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        {/* <div className="mb-2 w-1/2">
           <label
             htmlFor="default-search"
             className="mb-2 text-sm font-medium text-gray-900 sr-only"
@@ -168,57 +211,108 @@ export default function ClassSection({ params }) {
               Search
             </button>
           </div>
-        </div>
+        </div> */}
 
         <div className="mt-8 flex flex-wrap grid-cols-3 gap-5">
-          {loading
-            ? [1, 2, 3, 4, 5, 6, 7, 8].map((num, index) => (
-                <div
-                  key={index}
-                  className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md animate-pulse"
+          {loading ? (
+            [1, 2, 3, 4, 5, 6, 7, 8].map((num, index) => (
+              <div
+                key={index}
+                className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md animate-pulse"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+                <span className="bg-gray-200 w-[150px] h-[30px] rounded-md"></span>
+              </div>
+            ))
+          ) : students.length > 0 ? (
+            students.map((stud, index) => {
+              if (!subjectBasedComments) {
+                return (
+                  <Link
+                    href={`/teacher/${teacherId}/${classSectionId}/comments/${stud.id}`}
+                    key={index}
+                    className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                  </svg>
-                  <span className="bg-gray-200 w-[150px] h-[30px] rounded-md"></span>
-                </div>
-              ))
-            : students.length > 0 ? students.map((stud, index) => (
-                <Link
-                  href={`/teacher/${teacherId}/${classSectionId}/comments/${stud.id}`}
-                  key={index}
-                  className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                    <span>
+                      {stud.fName} {stud.lName}
+                    </span>
+                  </Link>
+                );
+              } else {
+                return (
+                  <button
+                    onClick={() => {
+                      if (!selectedSubject) {
+                        toast.error("Kindly select a subject to proceed!");
+                        return;
+                      }
+
+                      router.push(
+                        `/teacher/${teacherId}/${classSectionId}/comments/${stud.id}/${selectedSubject}`
+                      );
+                    }}
+                    type="button"
+                    key={index}
+                    className="p-3 py-5 border border-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center cursor-pointer gap-3 rounded-md"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                  </svg>
-                  <span>
-                    {stud.fName} {stud.lName}
-                  </span>
-                </Link>
-              )) : <div className="w-full text-center"> <p className="text-gray-600">No Students found.</p> <p className="text-sm">Please Contact your Administrator if there is any unexpected issue.</p> </div>}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                    <span>
+                      {stud.fName} {stud.lName}
+                    </span>
+                  </button>
+                );
+              }
+            })
+          ) : (
+            <div className="w-full text-center">
+              {" "}
+              <p className="text-gray-600">No Students found.</p>{" "}
+              <p className="text-sm">
+                Please Contact your Administrator if there is any unexpected
+                issue.
+              </p>{" "}
+            </div>
+          )}
         </div>
       </div>
     </div>
