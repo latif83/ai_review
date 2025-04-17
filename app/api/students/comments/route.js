@@ -11,12 +11,36 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
+    const { subjectId, classId } = body;
+
+    // console.log({ subjectId, classId })
+
     if (!body?.comments || !Array.isArray(body.comments)) {
       return NextResponse.json(
         { error: "Invalid request. 'comments' must be an array" },
         { status: 400 }
       );
     }
+    // Fetch students in the specified class
+    const studentsInClass = await prisma.students.findMany({
+      where: {
+        classId,
+      },
+      select: {
+        id: true, // Assuming 'id' is the primary key for students
+        studentId: true,
+      },
+    });
+
+    // Create a Set of student IDs in the class for quick lookup
+    const studentIdsInClass = new Set(
+      studentsInClass.map((student) => student.studentId)
+    );
+
+    // Filter comments to include only those for students in the specified class
+    body.comments = body.comments.filter((comment) =>
+      studentIdsInClass.has(comment.studentId)
+    );
 
     let newComments = [];
     let duplicateCount = 0;
@@ -40,6 +64,7 @@ export async function POST(req) {
           academicYr: comment.academicYr,
           academicTerm: comment.academicTerm,
           comment: comment.comment, // Allow different comments for the same student, term, and year
+          subjectId: subjectId,
         });
       }
     }

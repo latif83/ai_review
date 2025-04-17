@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { ExistingCommentsUpload } from "./existingCommentsUpload";
 import { ViewApproveComment } from "./viewApproveComment";
 import Link from "next/link";
 
@@ -10,11 +9,6 @@ export default function Comments() {
 
   return (
     <div className="px-5 py-5">
-      {uploadExistingComments && (
-        <ExistingCommentsUpload
-          setUploadExistingComments={setUploadExistingComments}
-        />
-      )}
 
       {viewComments && <ViewApproveComment setViewComments={setViewComments} />}
 
@@ -46,9 +40,8 @@ flex items-center gap-2"
         <p className="text-sm">Please select an action to perform!</p>
 
         <div className="mt-3 flex gap-4">
-          <button
-            onClick={() => setUploadExistingComments(true)}
-            type="button"
+          <Link
+          href={`/admin/comments/existingComments`}
             className="p-2 text-sm bg-indigo-600 hover:bg-indigo-800 text-white rounded-md flex items-center justify-center gap-2"
           >
             <svg
@@ -67,7 +60,7 @@ flex items-center gap-2"
             </svg>
 
             <span>Upload Existing Comments</span>
-          </button>
+          </Link>
 
           <button
             onClick={() => setViewComments(true)}

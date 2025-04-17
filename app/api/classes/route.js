@@ -55,6 +55,7 @@ export async function GET(req) {
       select: {
         id: true,
         className: true,
+        subjectBasedComments: true
       },
     });
 
