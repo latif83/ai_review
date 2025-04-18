@@ -19,12 +19,7 @@ export async function GET(req) {
         select: {
           id: true,
           className: true,
-          ClassSections: {
-            select: {
-              id : true,
-              sectionName: true,
-            },
-          }
+          subjectBasedComments : true
         },
       });
   

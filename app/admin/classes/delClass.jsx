@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export const DelSubject = ({ setDelSubject, subjectId, setFetchData }) => {
+export const DelClass = ({ setDelClass, classId, setFetchData }) => {
 
     const [loading, setLoading] = useState(false);
 
-    const delSubject = async () => {
+    const delClass = async () => {
         try {
             setLoading(true);
-            const response = await fetch("/api/subjects", {
+            const response = await fetch("/api/classes", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ id: subjectId }),
+                body: JSON.stringify({ id: classId }),
             });
 
             const data = await response.json();
@@ -21,7 +21,7 @@ export const DelSubject = ({ setDelSubject, subjectId, setFetchData }) => {
             if (response.ok) {
                 toast.success(data.message);
                 setFetchData(true);
-                setDelSubject(false);
+                setDelClass(false);
             } else {
                 toast.error(data.message);
             }
@@ -37,9 +37,9 @@ export const DelSubject = ({ setDelSubject, subjectId, setFetchData }) => {
             <div className="max-w-xl transition duration-1000 bg-white mx-auto rounded-xl p-3">
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium">
-                        Delete Subject
+                        Delete Class
                     </h1>
-                    <button onClick={() => setDelSubject(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
+                    <button onClick={() => setDelClass(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -48,14 +48,14 @@ export const DelSubject = ({ setDelSubject, subjectId, setFetchData }) => {
 
                 <div className="mt-5">
                     <p className="text-sm">
-                        Are you sure you want to delete this subject?
+                        Are you sure you want to delete this class?
                     </p>
 
                     <div className="mt-5 flex justify-between">
-                        <button onClick={() => setDelSubject(false)} className="p-2 bg-red-600 hover:bg-red-800 text-white transition duration-500 rounded-md" type="button">
+                        <button onClick={() => setDelClass(false)} className="p-2 bg-red-600 hover:bg-red-800 text-white transition duration-500 rounded-md" type="button">
                             Cancel
                         </button>
-                        <button disabled={loading} onClick={delSubject} className="p-2 bg-green-600 hover:bg-green-800 text-white transition duration-500 rounded-md flex gap-1.5 items-center disabled:bg-green-300" type="button">
+                        <button disabled={loading} onClick={delClass} className="p-2 bg-green-600 hover:bg-green-800 text-white transition duration-500 rounded-md flex gap-1.5 items-center disabled:bg-green-300" type="button">
                             {loading ? (
                                 <>
                                     <svg

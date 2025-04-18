@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { NewClassSection } from "./newClassSection";
 import { ClassSectionActions } from "./classSectionActions";
 import { ViewAssignment } from "./viewAssignment";
+import { EditClass } from "./editClass";
+import { DelClass } from "./delClass";
 
 export default function Classes() {
 
@@ -14,7 +16,7 @@ export default function Classes() {
 
     const [classes, setClasses] = useState([])
 
-    const [classesLoading, setClassesLoading] = useState(false)
+    const [classesLoading, setClassesLoading] = useState(true)
 
     const [sectionActions, setSectionActions] = useState(false)
     const [sectionData, setSectionData] = useState()
@@ -55,6 +57,12 @@ export default function Classes() {
 
     }, [fetchData])
 
+    const [editClass, setEditClass] = useState(false)
+    const [classInfo, setClassInfo] = useState({})
+
+    const [delClass, setDelClass] = useState(false)
+    const [classId, setClassId] = useState()
+
     return (
         <div className="px-5 py-5">
 
@@ -64,6 +72,10 @@ export default function Classes() {
             {sectionActions && <ClassSectionActions setSectionActions={setSectionActions} sectionData={sectionData} />}
 
             {viewAssignment && <ViewAssignment setViewAssignment={setViewAssignment} classData={classData} />}
+
+            {editClass && <EditClass setEditClass={setEditClass} setFetchData={setFetchData} classInfo={classInfo} />}
+
+            {delClass && <DelClass setDelClass={setDelClass} classId={classId} setFetchData={setFetchData} />}
 
             <div className="mb-5 flex justify-between items-center">
                 <div className="
@@ -86,21 +98,21 @@ flex items-center gap-2">
                 </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-3 md:grid-cols-4 gap-4">
 
-                {classes.map((clas, index) => (<div key={index} className="p-3 border rounded shadow-lg">
-                    <h1 className="font-bold">{clas.className}</h1>
+                {classesLoading ? [1, 2, 3, 4, 5, 6, 7, 8].map((num, index) => (<div key={index} className="p-3 border rounded shadow-lg animate-pulse">
+                    <h1 className="font-bold h-5 w-32 bg-gray-200 animate-pulse rounded-md"></h1>
 
                     <div className="mt-4 flex items-center gap-2">
 
-                        <button type="button" className="p-2 rounded-md bg-blue-200 hover:bg-blue-600 hover:text-white">
+                        <button type="button" className="p-2 rounded-md bg-blue-200">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                             </svg>
 
                         </button>
 
-                        <button type="button" className="p-2 rounded-md bg-red-200 hover:bg-red-600 hover:text-white">
+                        <button type="button" className="p-2 rounded-md bg-red-200">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                             </svg>
@@ -108,12 +120,7 @@ flex items-center gap-2">
 
                         </button>
 
-                        <button type="button" onClick={() => {
-                            setViewAssignment(true); setClassData({
-                                className: clas.className,
-                                classId: clas.id
-                            });
-                        }} className="p-2 rounded-md bg-lime-200 hover:bg-lime-600 hover:text-white">
+                        <button type="button" className="p-2 rounded-md bg-lime-200">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
                             </svg>
@@ -122,34 +129,54 @@ flex items-center gap-2">
 
                         </button>
 
-                        {/* <div className="border-b pb-2 flex justify-between">
-                            <p className="text-sm font-medium">Sections</p>
-                            <button onClick={()=>{
-                                setAddClassSection(true)
-                                setClassData({
-                                    className : clas.className,
-                                    classId : clas.id
-                                })
-                            }} type="button" className="hover:text-indigo-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+
+                    </div>
+                </div>)) : classes.map((clas, index) => (
+                    <div key={index} className="p-3 border rounded shadow-lg">
+                        <h1 className="font-bold">{clas.className}</h1>
+
+                        <div className="mt-4 flex items-center gap-2">
+
+                            {/* Edit button */}
+                            <button onClick={() => {
+                                setClassInfo(clas)
+                                setEditClass(true)
+                            }} type="button" className="p-2 rounded-md bg-blue-200 hover:bg-blue-600 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                 </svg>
 
                             </button>
-                        </div> */}
 
-                        {/* <div className="flex flex-wrap gap-2 mt-2 text-sm">
-                            {clas.ClassSections.length > 0 ? clas.ClassSections.map((section,index)=>(<span key={index} onClick={()=>{setSectionActions(true); setSectionData({
-                                classId : clas.id,
-                                className : clas.className,
-                                sectionId : section.id,
-                                sectionName : section.sectionName
-                            })}} className="bg-indigo-700 text-white p-2 px-3.5 rounded-full cursor-pointer hover:bg-red-700 transition duration-500">
-                                {section.sectionName}
-                            </span>)) : <span className="text-red-600">No Sections Added!</span>}
-                        </div> */}
-                    </div>
-                </div>))}
+                            {/* Delete button */}
+                            <button onClick={()=>{
+                                setClassId(clas.id)
+                                setDelClass(true)
+                            }} type="button" className="p-2 rounded-md bg-red-200 hover:bg-red-600 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+
+
+                            </button>
+
+                            {/* Assign Teachers Button */}
+                            <button type="button" onClick={() => {
+                                setViewAssignment(true); setClassData({
+                                    className: clas.className,
+                                    classId: clas.id
+                                });
+                            }} className="p-2 rounded-md bg-lime-200 hover:bg-lime-600 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                                </svg>
+
+
+
+                            </button>
+
+                        </div>
+                    </div>))}
 
 
             </div>

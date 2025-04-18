@@ -69,3 +69,90 @@ export async function GET(req) {
     );
   }
 }
+
+export async function PUT(req) {
+  try {
+    const { id, className, subjectBasedComments } = await req.json();
+
+    // Validate required fields
+    if (!id || !className) {
+      return NextResponse.json(
+        { message: "Missing required fields!" },
+        { status: 400 }
+      );
+    }
+
+    // Update the class in the database
+    await prisma.Classes.update({
+      where: { id },
+      data: {
+        className,
+        subjectBasedComments,
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Class updated successfully!" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating class:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
+
+export async function DELETE(req) {
+  try {
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Class ID is required!" },
+        { status: 400 }
+      );
+    }
+
+    // Check for associated students
+    const studentsCount = await prisma.students.count({
+      where: { classId: id },
+    });
+
+    // Check for associated teachers
+    const teachersCount = await prisma.Classes.findUnique({
+      where: { id },
+      select: {
+        teachers: true,
+      },
+    });
+
+    if (studentsCount > 0 || (teachersCount?.teachers.length ?? 0) > 0) {
+      return NextResponse.json(
+        {
+          message:
+            "Cannot delete class. There are associated students or teachers. Please remove them first.",
+        },
+        { status: 409 } // Conflict
+      );
+    }
+
+    // Delete the class
+    await prisma.classes.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { message: "Class deleted successfully!" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting class:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
