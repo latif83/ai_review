@@ -2,12 +2,12 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { ViewComment } from "./viewComment";
+import { ViewComment } from "../viewComment";
 
 export default function ViewStudentComment({ params }) {
   const router = useRouter();
 
-  const { studentId } = use(params);
+  const { studentId,subjectId } = use(params);
 
   const [fetchData, setFetchData] = useState(true);
 
@@ -19,7 +19,7 @@ export default function ViewStudentComment({ params }) {
     const getStudentRecentComments = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/students/${studentId}/comments`);
+        const response = await fetch(`/api/students/${studentId}/comments/${subjectId}`);
 
         const responseData = await response.json();
 

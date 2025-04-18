@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req, { params }) {
   try {
-    const { sectionId } = params;
+    const { sectionId } = await params;
 
     const ClassData = await prisma.Classes.findUnique({
       where: {
