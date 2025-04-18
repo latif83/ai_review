@@ -3,6 +3,8 @@ import { useRouter } from "next/navigation"
 import { NewSubject } from "./newSubject"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
+import { EditSubject } from "./editSubject"
+import { DelSubject } from "./deleteSubject"
 
 export default function Subjects() {
 
@@ -13,6 +15,12 @@ export default function Subjects() {
     const [loading, setLoading] = useState(true)
     const [fetchData, setFetchData] = useState(true)
     const [subjects, setSubjects] = useState([])
+
+    const [editSubject,setEditSubject] = useState(false)
+    const [subjectInfo,setSubjectInfo] = useState({})
+
+    const [delSubject,setDelSubject] = useState(false)
+    const [subjectId,setSubjectId] = useState("")
 
     useEffect(() => {
 
@@ -46,6 +54,10 @@ export default function Subjects() {
         <div className="px-5 py-5">
 
             {newSubject && <NewSubject setNewSubject={setNewSubject} setFetchData={setFetchData} />}
+
+            {editSubject && <EditSubject setEditSubject={setEditSubject} setFetchData={setFetchData} subjectInfo={subjectInfo} />}
+
+            {delSubject && <DelSubject setDelSubject={setDelSubject} subjectId={subjectId} setFetchData={setFetchData} />}
 
             <div className="flex justify-between items-center mb-5">
                 <div className="
@@ -114,8 +126,14 @@ flex items-center gap-2">
                                 {subject.name}
                             </td>
                             <td className="px-6 py-4">
-                                <button type="button" className="font-medium text-blue-600 hover:underline mr-2">Edit</button>
-                                <button type="button" className="font-medium text-red-600 hover:underline">Delete</button>
+                                <button onClick={()=>{
+                                    setSubjectInfo(subject);
+                                    setEditSubject(true);
+                                }} type="button" className="font-medium text-blue-600 hover:underline mr-2">Edit</button>
+                                <button onClick={()=>{
+                                    setSubjectId(subject.id);
+                                    setDelSubject(true);
+                                }} type="button" className="font-medium text-red-600 hover:underline">Delete</button>
                             </td>
                         </tr>)) : <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                             <td colSpan={3} className="px-6 py-4">
