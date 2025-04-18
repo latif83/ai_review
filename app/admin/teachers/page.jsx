@@ -149,7 +149,7 @@ flex items-center gap-2">
                                     {teacher.email}
                                 </td>
                                 <td className="px-6 py-4">
-                                    4
+                                    {teacher.classCount}
                                 </td>
                                 <td className="px-6 py-4">
                                     <button onClick={() => {

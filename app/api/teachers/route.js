@@ -47,9 +47,6 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    // Parse query parameters
-
-    // Fetch teachers from the database
     const teachers = await prisma.Teachers.findMany({
       orderBy: {
         createdAt: "desc",
@@ -58,20 +55,34 @@ export async function GET(req) {
         id: true,
         firstName: true,
         lastName: true,
-        email: true
+        email: true,
+        classes: {
+          select: {
+            id: true, // Or className if you want the names too
+          },
+        },
       },
     });
 
-    // Return the list of teachers
-    return NextResponse.json({ teachers }, { status: 200 });
+    // Map teachers and add class count
+    const result = teachers.map((teacher) => ({
+      id: teacher.id,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      classCount: teacher.classes.length,
+    }));
+
+    return NextResponse.json({ teachers: result }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching teachers:", error);
+    console.error("Error fetching teachers with class count:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
     );
   }
 }
+
 
 export async function PUT(req) {
   try {
