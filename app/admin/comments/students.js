@@ -118,7 +118,7 @@ export const Students = ({ setViewStudents, sectionData }) => {
                     </option>
                   ))
                 ) : (
-                  <option value="" disabled selected>
+                  <option value="">
                     No Subjects found
                   </option>
                 )}

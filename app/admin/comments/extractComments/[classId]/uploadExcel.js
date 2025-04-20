@@ -14,6 +14,19 @@ export const UploadExcel = ({ setUpload,studentsComments,className }) => {
     setFile(e.target.files[0]);
   };
 
+  const [translate, setTranslate] = useState(false);
+const [language, setLanguage] = useState("fr"); // default to French
+
+const supportedLanguages = [
+  { code: "fr", label: "French" },
+  { code: "es", label: "Spanish" },
+  { code: "de", label: "German" },
+  { code: "pt", label: "Portuguese" },
+  { code: "zh", label: "Chinese" },
+  { code: "ar", label: "Arabic" },
+];
+
+
   const processExcelFile = async (e) => {
     e.preventDefault();
 
@@ -27,53 +40,63 @@ export const UploadExcel = ({ setUpload,studentsComments,className }) => {
     try {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-
-        // Get the first sheet
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-
-        let excelData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-
-        // Update Excel with teacher comments
-        excelData = excelData.map((row) => {
-          const student = studentsComments.find(
-            (s) => s.studentId === row["STUDENT ID"]
+        const handleData = async () => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+      
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+      
+          let excelData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+      
+          // Translate and update comments
+          excelData = await Promise.all(
+            excelData.map(async (row) => {
+              const student = studentsComments.find(
+                (s) => s.studentId === row["STUDENT ID"]
+              );
+      
+              let comment = student?.comment || "";
+              if (comment && targetLang !== "en") {
+                try {
+                  comment = await translateText(comment, targetLang);
+                } catch (err) {
+                  console.error("Translation error:", err);
+                }
+              }
+      
+              return { ...row, "TEACHERS COMMENT": comment };
+            })
           );
-
-          if (student) {
-            return { ...row, "TEACHERS COMMENT": student.comment || "" };
-          }
-
-          return row;
-        });
-
-        // Convert updated data back to worksheet
-        const updatedSheet = XLSX.utils.json_to_sheet(excelData);
-        const updatedWorkbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(updatedWorkbook, updatedSheet, sheetName);
-
-        // Download updated Excel file
-        const excelBuffer = XLSX.write(updatedWorkbook, {
-          bookType: "xlsx",
-          type: "array",
-        });
-
-        const blob = new Blob([excelBuffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${className}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        toast.success("Excel file updated and downloaded!");
+      
+          const updatedSheet = XLSX.utils.json_to_sheet(excelData);
+          const updatedWorkbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(updatedWorkbook, updatedSheet, sheetName);
+      
+          const excelBuffer = XLSX.write(updatedWorkbook, {
+            bookType: "xlsx",
+            type: "array",
+          });
+      
+          const blob = new Blob([excelBuffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+      
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${className}.xlsx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+      
+          toast.success("Excel file updated and downloaded!");
+          setLoading(false);
+        };
+      
+        handleData();
       };
+      
 
       reader.readAsArrayBuffer(file);
     } catch (error) {
@@ -83,6 +106,29 @@ export const UploadExcel = ({ setUpload,studentsComments,className }) => {
       setLoading(false);
     }
   };
+
+  const translateText = async (text, targetLang) => {
+    try {
+      const res = await fetch("https://libretranslate.de/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          q: text,
+          source: "en",
+          target: targetLang,
+          format: "text",
+        }),
+      });
+  
+      const data = await res.json();
+      return data.translatedText || text;
+    } catch (error) {
+      console.error("Translation error:", error);
+      return text; // fallback to original if translation fails
+    }
+  };
+
+  
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       <div className="max-w-2xl relative transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
@@ -121,6 +167,33 @@ export const UploadExcel = ({ setUpload,studentsComments,className }) => {
               onChange={handleFileChange}
             />
           </div>
+
+          <div className="text-sm mt-4">
+  <label>
+    <input
+      type="checkbox"
+      checked={translate}
+      onChange={() => setTranslate(!translate)}
+      className="mr-2"
+    />
+    Translate comments
+  </label>
+
+  {translate && (
+    <select
+      value={language}
+      onChange={(e) => setLanguage(e.target.value)}
+      className="block mt-2 p-2 border rounded-md"
+    >
+      {supportedLanguages.map((lang) => (
+        <option key={lang.code} value={lang.code}>
+          {lang.label}
+        </option>
+      ))}
+    </select>
+  )}
+</div>
+
 
           <div className="flex justify-end pt-6">
             <button

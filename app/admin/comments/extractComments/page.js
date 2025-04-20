@@ -2,11 +2,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { SelectSubjectModal } from "./selectSubject";
+import { useRouter } from "next/navigation";
 
 export default function ExtractComments() {
   const [loading, setLoading] = useState(true);
 
   const [classes, setClasses] = useState([]);
+
+  const router = useRouter();
 
   useEffect(() => {
     const getClasses = async () => {
@@ -31,13 +35,23 @@ export default function ExtractComments() {
     getClasses();
   }, []);
 
+  const [selectSubject, setSelectSubject] = useState(false);
+  const [classId, setClassId] = useState(null);
+
   return (
     <div className="px-5 py-5">
+      {selectSubject && (
+        <SelectSubjectModal
+          setSelectSubject={setSelectSubject}
+          classId={classId}
+        />
+      )}
       <div className="mb-5 flex justify-between items-center">
         <div>
-          <div
-            className="
-        flex items-center gap-2"
+        <button
+            onClick={() => router.back()}
+            type="button"
+            className="flex items-center justify-center gap-1.5 p-2 rounded-md bg-red-200 hover:bg-red-700 hover:text-white transition duration-500 text-xs mt-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -45,17 +59,17 @@ export default function ExtractComments() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-6 h-6"
+              className="w-4 h-4"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819"
+                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
               />
             </svg>
 
-            <h1 className="text-gray-900 text-xl font-semibold">Classes</h1>
-          </div>
+            <span>Back</span>
+          </button>
 
           <p className="text-sm text-gray-600">
             Please select a class below to view / extract comments.
@@ -64,12 +78,44 @@ export default function ExtractComments() {
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        {classes.map((clas, index) => (
-          <Link href={`/admin/comments/extractComments/${clas.id}`} key={index} className="p-3 border rounded-md shadow hover:bg-gray-200 transition duration-500">
-            <h1 className="font-medium text-sm">{clas.className}</h1>
-          </Link>
-        ))}
+        {loading
+          ? [1, 2, 3, 4, 5, 6, 7, 8].map((num, index) => (
+              <div
+                key={index}
+                className="bg-gray-200 rounded-md animate-pulse h-12"
+              >
+                {" "}
+              </div>
+            ))
+          : classes.map((clas, index) => {
+              if (clas.subjectBasedComments) {
+                return (
+                  <button
+                    onClick={() => {
+                      setClassId(clas.id);
+                      setSelectSubject(true);
+                    }}
+                    type="button"
+                    key={index}
+                    className="p-3 border rounded-md shadow hover:bg-gray-200 transition duration-500"
+                  >
+                    <h1 className="font-medium text-sm">{clas.className}</h1>
+                  </button>
+                );
+              } else {
+                return (
+                  <Link
+                    href={`/admin/comments/extractComments/${clas.id}`}
+                    key={index}
+                    className="p-3 border rounded-md shadow hover:bg-gray-200 text-center transition duration-500"
+                  >
+                    <h1 className="font-medium text-sm">{clas.className}</h1>
+                  </Link>
+                );
+              }
+            })}
       </div>
     </div>
   );
 }
+// subjectBasedComments
