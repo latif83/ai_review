@@ -110,3 +110,24 @@ model subjects {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model AcademicYear {
+  id        String         @id @default(cuid())
+  year      String         @unique
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  // Relationship with AcademicTerm
+  terms     AcademicTerm[]
+}
+
+model AcademicTerm {
+  id             String       @id @default(cuid())
+  term           String       @unique
+  academicYearId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Define relation to AcademicYear
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+}
