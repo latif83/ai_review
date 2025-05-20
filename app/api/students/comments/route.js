@@ -45,6 +45,8 @@ export async function POST(req) {
     let newComments = [];
     let duplicateCount = 0;
 
+    // console.log({comments:body.comments})
+
     for (const comment of body.comments) {
       const existingComment = await prisma.comments.findFirst({
         where: {

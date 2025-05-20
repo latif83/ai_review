@@ -63,10 +63,10 @@ export const ExistingCommentsUpload = ({
       const rawData = XLSX.utils.sheet_to_json(sheet);
 
       const formattedData = rawData.map((row) => ({
-        academicYr: row["ACA YEAR"], // Adjust column names
-        academicTerm: row["TERM"],
-        comment: row["TEACHERS COMMENT"],
-        studentId: row["STUDENT ID"],
+        academicYr: academicYr, // Adjust column names
+        academicTerm: academicTerm,
+        comment: row["ENGLISH TEACHER`S COMMENT "] || row["FRENCH TEACHER`S COMMENT "],
+        studentId: row["STUDENT ID"]
       }));
 
       // console.log("Formatted Data:", formattedData);
@@ -107,6 +107,40 @@ export const ExistingCommentsUpload = ({
     }
   };
 
+  const [academicYr,setAcademicYr] = useState("");
+  const [academicTerm,setAcademicTerm] = useState("");
+
+  const [acdemicDataLoading,setAcademicDataLoading] = useState(true);
+  const [academicData,setAcademicData] = useState();
+
+  useEffect(()=>{
+
+    const getAcademicData = async () => {
+      setAcademicDataLoading(true);
+      try {
+        const response = await fetch(`/api/calendar`);
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+          toast.error(responseData.message || "Unexpected error happened, please try again later!");
+          return;
+        }
+
+        setAcademicData(responseData.academicYrs);
+
+      } catch (e) {
+        console.log(e);
+        toast.error("Internal server error!");
+      } finally {
+        setAcademicDataLoading(false);
+      }
+    };
+
+    getAcademicData();
+
+  },[])
+
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       <div className="max-w-xl transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
@@ -140,6 +174,70 @@ export const ExistingCommentsUpload = ({
         </div>
 
         <form onSubmit={sendToAPI} className="mt-8">
+          <div className="mb-8">
+            <p className="text-xs">
+              Please select an academic calendar to upload this existing
+              comments
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <div>
+                <label htmlFor="academicYr" className="text-sm block">
+                  Academic Year
+                </label>
+                <select
+                  id="academicYr"
+                  name="academicYr"
+                  className="p-2 border w-full rounded-md text-sm mt-3"
+                  value={academicYr}
+                  onChange={(e) => {
+                    setAcademicYr(e.target.value);
+                    setAcademicTerm("");
+                  }}
+                >
+                  <option value="">Select Academic Year</option>
+                  {acdemicDataLoading ? (
+                    <option value="">Loading...</option>
+                  ) : (
+                    academicData.map((year) => (
+                      <option key={year.id} value={year.year}>
+                        {year.year}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="academicTerm" className="text-sm block">
+                  Academic Term
+                </label>
+                <select
+                  id="academicTerm"
+                  name="academicTerm"
+                  className="p-2 border w-full rounded-md text-sm mt-3"
+                  value={academicTerm}
+                  onChange={(e) => setAcademicTerm(e.target.value)}
+                >
+                  <option value="">Select Academic Term</option>
+                  {acdemicDataLoading ? (
+                    <option value="">Loading...</option>
+                  ) : (
+                    academicData.map((year) => {
+                      if (year.year === academicYr) {
+                        return year.terms.map((term) => (
+                          <option key={term.id} value={term.term}>
+                            {term.term}
+                          </option>
+                        ));
+                      }
+                    })
+                  )}
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div className="">
             <label htmlFor="existingFile" className="text-sm block">
               Please select an excel file to process the existing comments!
