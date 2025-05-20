@@ -2,10 +2,14 @@
 import { useEffect, useState } from "react";
 import { NewYr } from "./newYr";
 import { toast } from "react-toastify";
+import { ViewYr } from "./viewYr";
 
 export default function AcademicCalendar() {
   const [addYr, setAddYr] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const [viewYr, setViewYr] = useState(false);
+  const [viewYrData, setViewYrData] = useState(null);
 
   const [academicYrs, setAcademicYrs] = useState([]);
   const [fetchData, setFetchData] = useState(true);
@@ -44,6 +48,7 @@ export default function AcademicCalendar() {
   return (
     <div className="px-5 py-5">
       {addYr && <NewYr setAddYr={setAddYr} setFetchData={setFetchData} />}
+      {viewYr && <ViewYr setViewYr={setViewYr} viewYrData={viewYrData} />}
       <div className="mb-5 flex justify-between items-center">
         <div
           className="
@@ -111,6 +116,10 @@ flex items-center gap-2"
         ) : academicYrs.length > 0 ? (
           academicYrs.map((yr, index) => (
             <button
+              onClick={() => {
+                setViewYrData(yr);
+                setViewYr(true);
+              }}
               key={index}
               type="button"
               className="bg-white p-5 flex flex-col gap-2 border rounded-lg border-2 hover:bg-gray-600 transition duration-500 hover:text-white hover:border-gray-600"

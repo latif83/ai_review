@@ -1,24 +1,25 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export const NewYr = ({ setAddYr,setFetchData }) => {
+export const NewTerm = ({ setAddTerm,setFetchData,yrId }) => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    year: "",
+    term: "",
+    academicYearId : yrId
   });
 
-  const submitAcademicYr = async (e) => {
+  const submitAcademicTerm = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
 
-      const response = await fetch(`/api/calendar/year`, {
+      const response = await fetch(`/api/calendar/terms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       const responseData = await response.json();
@@ -32,7 +33,7 @@ export const NewYr = ({ setAddYr,setFetchData }) => {
 
       toast.success(responseData.message);
       setFetchData(true);
-      setAddYr(false);
+      setAddTerm(false);
     } catch (e) {
       console.log(e);
       toast.error("Internal Server Error!");
@@ -45,9 +46,9 @@ export const NewYr = ({ setAddYr,setFetchData }) => {
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       <div className="max-w-2xl transition duration-1000 bg-white mx-auto rounded-xl p-3 py-6">
         <div className="flex justify-between items-center">
-          <h1 className="font-medium">New Academic Year</h1>
+          <h1 className="font-medium">New Academic Term</h1>
           <button
-            onClick={() => setAddYr(false)}
+            onClick={() => setAddTerm(false)}
             type="button"
             className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500"
           >
@@ -68,25 +69,25 @@ export const NewYr = ({ setAddYr,setFetchData }) => {
           </button>
         </div>
 
-        <form onSubmit={submitAcademicYr} className="mt-5">
+        <form onSubmit={submitAcademicTerm} className="mt-5">
           <div>
             <label
               htmlFor="studentId"
               className="block mb-2 text-sm font-medium text-gray-900"
             >
-              Academic Year
+              Academic Term
             </label>
             <input
               type="text"
               id="studentId"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              placeholder="e.g 2023/2024, 2024/2025, etc."
+              placeholder="e.g Term 1, Term 2, etc."
               required
-              value={formData.year}
+              value={formData.term}
               onChange={(e) =>
                 setFormData((prevData) => ({
                   ...prevData,
-                  year: e.target.value,
+                  term: e.target.value,
                 }))
               }
             />
@@ -123,7 +124,7 @@ export const NewYr = ({ setAddYr,setFetchData }) => {
                   Processing…
                 </>
               ) : (
-                <span>Add Academic Year</span>
+                <span>Add Academic Term</span>
               )}
             </button>
           </div>

@@ -20,7 +20,7 @@ export async function GET() {
             termCount: year._count.terms,
         }));
 
-        console.log({academicYrsWithCount})
+        // console.log({academicYrsWithCount})
 
         return NextResponse.json({ academicYrs: academicYrsWithCount }, { status: 200 });
     } catch (e) {

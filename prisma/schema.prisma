@@ -123,7 +123,7 @@ model AcademicYear {
 
 model AcademicTerm {
   id             String       @id @default(cuid())
-  term           String       @unique
+  term           String      
   academicYearId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
