@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export const NewTerm = ({ setAddTerm,setFetchData,yrId }) => {
+export const NewTerm = ({ setAddTerm, setFetchData, yrId, setF }) => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     term: "",
-    academicYearId : yrId
+    academicYearId: yrId,
   });
 
   const submitAcademicTerm = async (e) => {
@@ -19,19 +19,21 @@ export const NewTerm = ({ setAddTerm,setFetchData,yrId }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       const responseData = await response.json();
 
       if (!response.ok) {
         toast.error(
-          responseData.message || "Unexpected error while adding academic year, please try again later!"
+          responseData.message ||
+            "Unexpected error while adding academic year, please try again later!"
         );
         return;
       }
 
       toast.success(responseData.message);
+      setF(true);
       setFetchData(true);
       setAddTerm(false);
     } catch (e) {

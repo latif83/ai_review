@@ -48,7 +48,7 @@ export default function AcademicCalendar() {
   return (
     <div className="px-5 py-5">
       {addYr && <NewYr setAddYr={setAddYr} setFetchData={setFetchData} />}
-      {viewYr && <ViewYr setViewYr={setViewYr} viewYrData={viewYrData} />}
+      {viewYr && <ViewYr setViewYr={setViewYr} viewYrData={viewYrData} setF={setFetchData} />}
       <div className="mb-5 flex justify-between items-center">
         <div
           className="
