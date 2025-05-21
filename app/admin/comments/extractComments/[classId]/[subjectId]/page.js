@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { UploadExcel } from "../uploadExcel";
 
 export default function StudentsClassCommentDetails({ params }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { classId,subjectId } = use(params);
 
   const [commentData, setCommentData] = useState([]);
@@ -20,31 +20,62 @@ export default function StudentsClassCommentDetails({ params }) {
 
   const [subjectName,setSubjectName] = useState("")
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await fetch(`/api/classes/getComments/${classId}/${subjectId}`);
-        const responseData = await response.json();
+  const getData = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/classes/getComments/${classId}/${subjectId}?academicYr=${academicYr}&academicTerm=${academicTerm}`);
+      const responseData = await response.json();
 
-        if (!response.ok) {
-          toast.error(responseData.message);
-          return;
-        }
-
-        setCommentData(responseData.students);
-        setClassName(responseData.className);
-        setSubjectName(responseData.subjectName);
-        setFileUploaded(responseData.fileUploaded);
-      } catch (e) {
-        console.log(e);
-        toast.error("Internal server error!");
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        toast.error(responseData.message);
+        return;
       }
-    };
 
-    getData();
-  }, []);
+      setCommentData(responseData.students);
+      setClassName(responseData.className);
+      setSubjectName(responseData.subjectName);
+      setFileUploaded(responseData.fileUploaded);
+    } catch (e) {
+      console.log(e);
+      toast.error("Internal server error!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   const [academicYr, setAcademicYr] = useState("");
+    const [academicTerm, setAcademicTerm] = useState("");
+  
+    const [acdemicDataLoading, setAcademicDataLoading] = useState(true);
+    const [academicData, setAcademicData] = useState();
+  
+    useEffect(() => {
+      const getAcademicData = async () => {
+        setAcademicDataLoading(true);
+        try {
+          const response = await fetch(`/api/calendar`);
+  
+          const responseData = await response.json();
+  
+          if (!response.ok) {
+            toast.error(
+              responseData.message ||
+                "Unexpected error happened, please try again later!"
+            );
+            return;
+          }
+  
+          setAcademicData(responseData.academicYrs);
+        } catch (e) {
+          console.log(e);
+          toast.error("Internal server error!");
+        } finally {
+          setAcademicDataLoading(false);
+        }
+      };
+  
+      getAcademicData();
+    }, []);
 
   return (
     <div className="px-5 py-5">
@@ -117,6 +148,86 @@ export default function StudentsClassCommentDetails({ params }) {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="mt-2 bg-gray-200 p-3 rounded-md">
+        <p className="text-xs">Please select an academic calendar</p>
+
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div>
+            <label htmlFor="academicYr" className="text-xs block">
+              Academic Year
+            </label>
+            <select
+              id="academicYr"
+              name="academicYr"
+              className="p-2 border w-full rounded-md text-xs mt-2"
+              value={academicYr}
+              onChange={(e) => {
+                setAcademicYr(e.target.value);
+                setAcademicTerm("");
+              }}
+            >
+              <option value="">Select Academic Year</option>
+              {acdemicDataLoading ? (
+                <option value="">Loading...</option>
+              ) : (
+                academicData.map((year) => (
+                  <option key={year.id} value={year.year}>
+                    {year.year}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="academicTerm" className="text-xs block">
+              Academic Term
+            </label>
+            <select
+              id="academicTerm"
+              name="academicTerm"
+              className="p-2 border w-full rounded-md text-xs mt-2"
+              value={academicTerm}
+              onChange={(e) => setAcademicTerm(e.target.value)}
+            >
+              <option value="">Select Academic Term</option>
+              {acdemicDataLoading ? (
+                <option value="">Loading...</option>
+              ) : (
+                academicData.map((year) => {
+                  if (year.year === academicYr) {
+                    return year.terms.map((term) => (
+                      <option key={term.id} value={term.term}>
+                        {term.term}
+                      </option>
+                    ));
+                  }
+                })
+              )}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex mt-1 justify-end">
+        <button onClick={()=>getData()} type="button" className="p-2 rounded-md bg-blue-600 text-white">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            />
+          </svg>
+        </button>
       </div>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-7">

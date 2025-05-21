@@ -6,7 +6,7 @@ import { UploadExcel } from "./uploadExcel";
 import { DownloadExcel } from "./downloadExcel";
 
 export default function StudentsClassCommentDetails({ params }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { classId } = use(params);
 
   const [commentData, setCommentData] = useState([]);
@@ -19,29 +19,61 @@ export default function StudentsClassCommentDetails({ params }) {
 
   const [upload, setUpload] = useState(false);
 
+  const getData = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/classes/getComments/${classId}?academicYr=${academicYr}&academicTerm=${academicTerm}`);
+      
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        toast.error(responseData.message);
+        return;
+      }
+
+      setCommentData(responseData.students);
+      setClassName(responseData.className);
+      setFileUploaded(responseData.fileUploaded);
+    } catch (e) {
+      console.log(e);
+      toast.error("Internal server error!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [academicYr, setAcademicYr] = useState("");
+  const [academicTerm, setAcademicTerm] = useState("");
+
+  const [acdemicDataLoading, setAcademicDataLoading] = useState(true);
+  const [academicData, setAcademicData] = useState();
+
   useEffect(() => {
-    const getData = async () => {
+    const getAcademicData = async () => {
+      setAcademicDataLoading(true);
       try {
-        const response = await fetch(`/api/classes/getComments/${classId}`);
+        const response = await fetch(`/api/calendar`);
+
         const responseData = await response.json();
 
         if (!response.ok) {
-          toast.error(responseData.message);
+          toast.error(
+            responseData.message ||
+              "Unexpected error happened, please try again later!"
+          );
           return;
         }
 
-        setCommentData(responseData.students);
-        setClassName(responseData.className);
-        setFileUploaded(responseData.fileUploaded);
+        setAcademicData(responseData.academicYrs);
       } catch (e) {
         console.log(e);
         toast.error("Internal server error!");
       } finally {
-        setLoading(false);
+        setAcademicDataLoading(false);
       }
     };
 
-    getData();
+    getAcademicData();
   }, []);
 
   return (
@@ -146,7 +178,87 @@ export default function StudentsClassCommentDetails({ params }) {
         </div>
       </div>
 
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-7">
+      <div className="mt-2 bg-gray-200 p-3 rounded-md">
+        <p className="text-xs">Please select an academic calendar</p>
+
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div>
+            <label htmlFor="academicYr" className="text-xs block">
+              Academic Year
+            </label>
+            <select
+              id="academicYr"
+              name="academicYr"
+              className="p-2 border w-full rounded-md text-xs mt-2"
+              value={academicYr}
+              onChange={(e) => {
+                setAcademicYr(e.target.value);
+                setAcademicTerm("");
+              }}
+            >
+              <option value="">Select Academic Year</option>
+              {acdemicDataLoading ? (
+                <option value="">Loading...</option>
+              ) : (
+                academicData.map((year) => (
+                  <option key={year.id} value={year.year}>
+                    {year.year}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="academicTerm" className="text-xs block">
+              Academic Term
+            </label>
+            <select
+              id="academicTerm"
+              name="academicTerm"
+              className="p-2 border w-full rounded-md text-xs mt-2"
+              value={academicTerm}
+              onChange={(e) => setAcademicTerm(e.target.value)}
+            >
+              <option value="">Select Academic Term</option>
+              {acdemicDataLoading ? (
+                <option value="">Loading...</option>
+              ) : (
+                academicData.map((year) => {
+                  if (year.year === academicYr) {
+                    return year.terms.map((term) => (
+                      <option key={term.id} value={term.term}>
+                        {term.term}
+                      </option>
+                    ));
+                  }
+                })
+              )}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex mt-1 justify-end">
+        <button onClick={()=>getData()} type="button" className="p-2 rounded-md bg-blue-600 text-white">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
@@ -197,7 +309,19 @@ export default function StudentsClassCommentDetails({ params }) {
                   <td className="px-6 py-4">
                     {data.comment ? data.comment : "N/A"}
                   </td>
-                  <td className="px-6 py-4">{data.ApprovedBy ? <span className="text-lime-700 font-medium"> Approved</span> : <span className="text-red-700 font-medium"> Not Approved</span>}</td>
+                  <td className="px-6 py-4">
+                    {data.ApprovedBy ? (
+                      <span className="text-lime-700 font-medium">
+                        {" "}
+                        Approved
+                      </span>
+                    ) : (
+                      <span className="text-red-700 font-medium">
+                        {" "}
+                        Not Approved
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))
             ) : (

@@ -11,6 +11,20 @@ export async function GET(req, { params }) {
   try {
     const { classId } = await params;
 
+    const url = new URL(req.url);
+    const searchParams = url.searchParams;
+    const academicYr = searchParams.get("academicYr");
+    const academicTerm = searchParams.get("academicTerm");
+
+    // console.log({ academicYr, academicTerm });
+
+    if (!academicYr || !academicTerm) {
+      return NextResponse.json(
+        { message: "Please select an academic calendar!" },
+        { status: 400 }
+      );
+    }
+
     const classDetails = await prisma.Classes.findUnique({
       where: {
         id: classId,
@@ -36,8 +50,8 @@ export async function GET(req, { params }) {
     // Fetch comments for these students
     const comments = await prisma.Comments.findMany({
       where: {
-        academicYr: "2024/2025",
-        academicTerm: "Term 2",
+        academicYr,
+        academicTerm,
         studentId: {
           in: studentIds,
         }, // Fetch comments where studentId matches
