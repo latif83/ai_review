@@ -62,7 +62,7 @@ flex items-center gap-2"
             <span>Upload Existing Comments</span>
           </Link>
 
-          <button
+          {/* <button
             onClick={() => setViewComments(true)}
             type="button"
             className="p-2 text-sm bg-lime-600 hover:bg-lime-800 text-white rounded-md flex items-center justify-center gap-2"
@@ -83,7 +83,7 @@ flex items-center gap-2"
             </svg>
 
             <span>View / Approve Comments</span>
-          </button>
+          </button> */}
 
           <Link
             href="/admin/comments/extractComments"
@@ -104,7 +104,7 @@ flex items-center gap-2"
               />
             </svg>
 
-            <span>View / Extract Comments</span>
+            <span>View Comments</span>
           </Link>
         </div>
       </div>

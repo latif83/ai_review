@@ -4,18 +4,25 @@ import { EditComment } from "./editComment";
 import { toast } from "react-toastify";
 import { DeleteComments } from "./delComment";
 
-export const ViewComment = ({ setViewComment, comment, studentId, setFetchData }) => {
+export const ViewComment = ({
+  setViewComment,
+  comment,
+  studentId,
+  setFetchData,
+}) => {
   const [approveComment, setApproveComment] = useState(false);
 
   const [editComment, setEditComment] = useState(false);
 
-  const [comm,setComment] = useState(comment.comment)
+  const [comm, setComment] = useState(comment.comment);
 
-  const [fC,setFC] = useState(false)
+  const [fC, setFC] = useState(false);
 
   const getCommentData = async () => {
     try {
-      const response = await fetch(`/api/students/comments/${comment.id}`);
+      const response = await fetch(
+        `/api/students/comments/${comment.commentId}`
+      );
 
       const responseData = await response.json();
 
@@ -24,45 +31,52 @@ export const ViewComment = ({ setViewComment, comment, studentId, setFetchData }
         return;
       }
 
-      setComment(responseData.comment.comment)
-
-
+      setComment(responseData.comment.comment);
     } catch (e) {
       console.log(e);
     } finally {
-    //   setLoading(false);
+      //   setLoading(false);
     }
   };
 
-  useEffect(()=>{
-    if(fC){
-    getCommentData()
-    setFC(false)
+  useEffect(() => {
+    if (fC) {
+      getCommentData();
+      setFC(false);
     }
-  },[fC])
+  }, [fC]);
 
-  const [delComment,setDelComment] = useState(false)
+  const [delComment, setDelComment] = useState(false);
 
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       {approveComment && (
         <ApproveComments
           setApproveComment={setApproveComment}
-          commentId={comment.id}
+          commentId={comment.commentId}
           studentId={studentId}
+          setViewComment={setViewComment}
+          setFetchData={setFetchData}
         />
       )}
 
       {editComment && (
         <EditComment
           setEditComment={setEditComment}
-          comment={{id:comment.id,comment:comm}}
+          comment={{ id: comment.commentId, comment: comm }}
           studentId={studentId}
           setFC={setFC}
         />
       )}
 
-      {delComment && <DeleteComments setDelComment={setDelComment} commentId={comment.id} setFetchData={setFetchData} setViewComment={setViewComment} /> }
+      {delComment && (
+        <DeleteComments
+          setDelComment={setDelComment}
+          commentId={comment.commentId}
+          setFetchData={setFetchData}
+          setViewComment={setViewComment}
+        />
+      )}
 
       <div className="max-w-4xl relative transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
         <div className="flex justify-between items-center">
@@ -169,7 +183,7 @@ export const ViewComment = ({ setViewComment, comment, studentId, setFetchData }
               </button>
 
               <button
-              onClick={()=>setDelComment(true)}
+                onClick={() => setDelComment(true)}
                 type="button"
                 className="bg-red-600 hover:bg-red-800 text-white p-2 rounded-md flex gap-1.5 items-center text-sm"
               >

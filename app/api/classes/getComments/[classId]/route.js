@@ -56,7 +56,7 @@ export async function GET(req, { params }) {
           in: studentIds,
         }, // Fetch comments where studentId matches
       },
-      select: { studentId: true, comment: true, ApprovedBy: true },
+      select: { id:true,studentId: true, comment: true, ApprovedBy: true },
     });
 
     const checkExcelFileUpload = await prisma.UploadExcel.findMany({
@@ -71,6 +71,9 @@ export async function GET(req, { params }) {
     // Map comments to respective students
     const studentsWithComments = students.map((student) => ({
       ...student,
+      commentId:
+        comments.find((comment) => comment.studentId === student.studentId)
+          ?.id || null,
       comment:
         comments.find((comment) => comment.studentId === student.studentId)
           ?.comment || null, // Get the comment or null if not found
@@ -78,6 +81,8 @@ export async function GET(req, { params }) {
         comments.find((comment) => comment.studentId === student.studentId)
           ?.ApprovedBy || null,
     }));
+
+    // console.log({ studentsWithComments });
 
     return NextResponse.json(
       {

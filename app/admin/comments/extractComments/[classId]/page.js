@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { UploadExcel } from "./uploadExcel";
 import { DownloadExcel } from "./downloadExcel";
+import { ViewComment } from "../../[studentId]/viewComment";
 
 export default function StudentsClassCommentDetails({ params }) {
   const [loading, setLoading] = useState(false);
@@ -21,9 +22,11 @@ export default function StudentsClassCommentDetails({ params }) {
 
   const getData = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`/api/classes/getComments/${classId}?academicYr=${academicYr}&academicTerm=${academicTerm}`);
-      
+      setLoading(true);
+      const response = await fetch(
+        `/api/classes/getComments/${classId}?academicYr=${academicYr}&academicTerm=${academicTerm}`
+      );
+
       const responseData = await response.json();
 
       if (!response.ok) {
@@ -76,6 +79,10 @@ export default function StudentsClassCommentDetails({ params }) {
     getAcademicData();
   }, []);
 
+  const [viewComment, setViewComment] = useState(false);
+
+  const [comment, setComment] = useState({});
+
   return (
     <div className="px-5 py-5">
       {upload && (
@@ -84,6 +91,10 @@ export default function StudentsClassCommentDetails({ params }) {
           studentsComments={commentData}
           className={className}
         />
+      )}
+
+      {viewComment && (
+        <ViewComment setViewComment={setViewComment} comment={comment} setFetchData={getData} />
       )}
 
       <div className="flex justify-between items-center gap-2">
@@ -240,7 +251,11 @@ export default function StudentsClassCommentDetails({ params }) {
       </div>
 
       <div className="flex mt-1 justify-end">
-        <button onClick={()=>getData()} type="button" className="p-2 rounded-md bg-blue-600 text-white">
+        <button
+          onClick={() => getData()}
+          type="button"
+          className="p-2 rounded-md bg-blue-600 text-white"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -302,25 +317,41 @@ export default function StudentsClassCommentDetails({ params }) {
                 >
                   <th
                     scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap w-2/8"
                   >
                     {`${data.fName} ${data.lName}`}
                   </th>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 w-4/8">
                     {data.comment ? data.comment : "N/A"}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 2/8">
                     {data.ApprovedBy ? (
-                      <span className="text-lime-700 font-medium">
+                      <span className="text-lime-700 inline-block font-medium">
                         {" "}
                         Approved
                       </span>
                     ) : (
-                      <span className="text-red-700 font-medium">
+                      <span className="text-red-700 inline-block font-medium">
                         {" "}
                         Not Approved
                       </span>
                     )}
+
+                    <button
+                      onClick={() => {
+                        if(!data.comment) {
+                          toast.error("No comment found!");
+                          return;
+                        }
+
+                        setComment(data);
+                        setViewComment(true);
+                      }}
+                      type="button"
+                      className="text-xs bg-cyan-600 block hover:bg-cyan-400 p-2 rounded-md text-white"
+                    >
+                      View Comment
+                    </button>
                   </td>
                 </tr>
               ))

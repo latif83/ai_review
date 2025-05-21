@@ -110,6 +110,8 @@ export async function PUT(req) {
       const { approvedBy,commentId } = await req.json();
       // const { commentId } = params;
 
+      console.log({ approvedBy,commentId })
+
       if (!approvedBy) {
           return NextResponse.json(
               { message: "Please provide the approvedBy field." },

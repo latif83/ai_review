@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-export const ApproveComments = ({ setApproveComment,commentId,studentId }) => {
+export const ApproveComments = ({ setApproveComment,commentId,studentId ,setViewComment,setFetchData }) => {
 
     const [loading,setLoading] = useState(false)
 
@@ -9,7 +9,7 @@ export const ApproveComments = ({ setApproveComment,commentId,studentId }) => {
            const approveComment = async () => {
               setLoading(true);
               try {
-                const response = await fetch(`/api/students/${studentId}/comments`, {
+                const response = await fetch(`/api/students/studentId/comments`, {
                   method: "PUT",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ approvedBy: "Management", commentId }),
@@ -22,10 +22,12 @@ export const ApproveComments = ({ setApproveComment,commentId,studentId }) => {
                 }
           
                 toast.success(responseData.message);
-                // setFetchData(true);
+                setViewComment(false);
+                setFetchData(true);
                 setApproveComment(false)
               } catch (e) {
                 console.log(e);
+                toast.error("Internal Server Error!");
               } finally {
                 setLoading(false);
               }
