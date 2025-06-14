@@ -42,6 +42,8 @@ export async function POST(req) {
       studentIdsInClass.has(comment.studentId)
     );
 
+    // console.log(body.comments)
+
     let newComments = [];
     let duplicateCount = 0;
 
