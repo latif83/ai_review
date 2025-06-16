@@ -68,7 +68,7 @@ export const ExistingCommentsUpload = ({
       const formattedData = rawData.map((row) => ({
         academicYr: academicYr, // Adjust column names
         academicTerm: academicTerm,
-        comment: row["ENGLISH TEACHER`S COMMENT"] || row["FRENCH TEACHER`S COMMENT "],
+        comment: row["ENGLISH TEACHER`S COMMENT "] || row["FRENCH TEACHER`S COMMENT "] || row["TEACHERS COMMENT"],
         studentId: row["STUDENT ID"]
       }));
 

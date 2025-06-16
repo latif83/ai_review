@@ -1,13 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { SubmitComment } from "./submitComment";
 
 // OpenRouter API configuration
 const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY; // Replace this with your OpenRouter API key
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = process.env.NEXT_PUBLIC_MODEL; // You can also use "gpt-4" or "claude-3-opus"
 
-export const NewComment = ({ previousComments, studentName, setNewComment, studentId, teacherName, setFetchData,subjectId,subjectName }) => {
+export const NewComment = ({ previousComments, studentName, setNewComment, studentId, teacherName, setFetchData, subjectId, subjectName }) => {
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState({});
     const [generatedComment, setGeneratedComment] = useState("");
@@ -16,6 +17,9 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
     // Function to fetch AI-generated questions
     const fetchQuestions = async () => {
         setLoading(true);
+        setQuestions([])
+        setAnswers({})
+        setGeneratedComment("")
         try {
             const response = await fetch(OPENROUTER_API_URL, {
                 method: "POST",
@@ -29,7 +33,9 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                         { role: "system", content: "You are a helpful assistant for teachers. Always return valid JSON arrays." },
                         {
                             role: "user",
-                            content: `Based on the student's previous comments for student with name ${studentName}: "${previousComments}" which is related to the subject ${subjectName}, generate 7 multiple-choice questions for the teacher to assess the student's progress. last 2 questions should not be related to the previous comments, it should be new general questions out of context of the previous comments to know how the student is doing generally, the first 5 should be from the previous comments. Please if the previous comments are empty, please ask general 7 questions for the student about his/her progress in class and this comment is only linked to one subject ${subjectName} just to know the how he is doing in class with the subject, these questions are answered by the teacher about the student whose name ${studentName} to generate assessment, and please use words like your,you've referring to the teachers class.
+                            content: `Based on the student's previous comments for student with name ${studentName}: "${previousComments}" which is related to the subject ${subjectName}, generate 7 multiple-choice questions for the teacher to assess the student's progress. last 2 questions should not be related to the previous comments, it should be new general questions out of context of the previous comments to know how the student is doing generally, the first 5 should be from the previous comments. Please if the previous comments are empty, please ask general 7 questions for the student about his/her progress in class and some of this comment should ask the student progress and understanding in the subject ${subjectName} just to know the how he is doing in class with the subject, don't ask question like an exams question, hell no we just what to know how the student grabbed the subject overall performance, this an assessment not an exams, and all questions shouldn't be based on the subject just a few 2 or 3 questions, these questions are answered by the teacher about the student whose name ${studentName} to generate assessment, and please use words like your,you've referring to the teachers class.
+
+                            if there are not and previous comments just generate general questions to assess the student, it should be general to assess his/her performance in class.
 
                             i also have complains the questions are similar, please try to bring some uniqueness in each question.
                             
@@ -67,7 +73,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
             });
 
             const data = await response.json();
-            // console.log(data)
+            console.log(data)
             // console.log("Raw Response:", data.choices[0].message.content);
 
             try {
@@ -99,6 +105,8 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                 // Parse JSON
                 const parsedQuestions = JSON.parse(rawContent);
 
+                // console.log({parsedQuestions})
+
                 // Validate structure
                 if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
                     throw new Error("Invalid response structure: Not a valid questions array");
@@ -114,30 +122,43 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                 setQuestions(parsedQuestions);
             } catch (error) {
                 console.error("Error parsing AI response:", error.message);
+                toast.error("Something happened generating questions, please try again!")
             }
 
         } catch (error) {
             console.error("Error generating questions:", error);
+            toast.error("Something happened generating questions, please try again!")
         }
         setLoading(false);
     };
-
 
     // Handle answer selection
     const handleAnswerChange = (questionIndex, selectedOption) => {
         setAnswers((prev) => ({ ...prev, [questionIndex]: selectedOption }));
     };
 
+    const [gLoading, setGLoading] = useState(false)
+
+    const generatedCommentRef = useRef(null);
+
+    const [scroll,setScroll] = useState(false)
+
+    useEffect(() => {
+        scroll && generatedCommentRef.current?.scrollIntoView({ behavior: 'smooth' }) && setScroll(false)
+    }, [scroll])
+
+    const [targetLanguage,setTargetLanguage] = useState("English")
+
     // Function to generate a comment based on selected answers
     const generateComment = async () => {
-        setLoading(true);
         try {
+            setGLoading(true);
             const selectedAnswersText = Object.values(answers).join(", ");
 
             // Check if selectedAnswersText is empty
             if (!selectedAnswersText.trim()) {
                 toast.error("Please select at least one answer before proceeding.");
-                setLoading(false);
+                setGLoading(false);
                 return;
             }
 
@@ -159,7 +180,8 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 - Structure it in this format:  
   1. **Highlight strengths**: Mention the student’s strong areas.  
   2. **Note areas for improvement**: Point out what they need to improve.  
-  3. **Encouragement**: Encourage them to keep up their efforts.  
+  3. **Encouragement**: Encourage them to keep up their efforts.
+  4. **Language**: comment should be generated in ${targetLanguage}.
 - Return the response **strictly** as a JSON object in this format:  
 
 \`\`\`json  
@@ -185,6 +207,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
             try {
                 const parsedComment = JSON.parse(rawContent);
                 setGeneratedComment(parsedComment.comment || "No comment generated.");
+                setScroll(true)
             } catch (parseError) {
                 console.error("Error parsing comment JSON:", parseError);
                 setGeneratedComment("Invalid response format.");
@@ -192,47 +215,22 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 
         } catch (error) {
             console.error("Error generating comment:", error);
+            toast.error("Error generating comment please try again!")
         }
-        setLoading(false);
+       finally{
+         setGLoading(false);
+       }
     };
 
-    const [sLoading, setSLoading] = useState(false)
-
-    const submitComments = async () => {
-        try {
-
-            setSLoading(true)
-            const response = await fetch(`/api/students/${studentId}/comments/multipleComments`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ studentId, comment: generatedComment, by: teacherName,subjectId }),
-            })
-
-            const responseData = await response.json()
-            if (!response.ok) {
-                toast.error(responseData.message)
-                return
-            }
-
-            toast.success(responseData.message)
-            setFetchData(true)
-            setNewComment(false)
-        }
-        catch (e) {
-            console.log(e)
-        } finally {
-            setSLoading(false)
-        }
-    }
+    const [submitComment, setSubmitComment] = useState(false)
 
     return (
         <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
+            {submitComment && <SubmitComment generatedComment={generatedComment} setSubmitComment={setSubmitComment} studentId={studentId} teacherName={teacherName} setFetchData={setFetchData} setNewComment={setNewComment} subjectId={subjectId} />}
             <div className="max-w-4xl transition duration-1000 bg-white h-full overflow-y-auto mx-auto rounded-t-xl p-3">
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium">
-                        Generate New Comment changes
+                        Generate New Comment
                     </h1>
                     <button onClick={() => setNewComment(false)} type="button" className="bg-red-200 text-black p-2 rounded-full hover:bg-red-800 hover:text-white transition duration-500">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -344,14 +342,28 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                             </div>
                         ))}
 
-                        {/* Button to generate the final AI comment */}
+                        <div className="flex items-center gap-2 justify-between mt-4">
+                            <div className="flex items-center gap-2"> <label htmlFor="translateLang" className="text-sm">Generate in:</label>
+                            <select
+                                id="translateLang"
+                                className="p-1 border rounded-md text-sm"
+                                value={targetLanguage}
+                                onChange={(e) => {
+                                    setTargetLanguage(e.target.value);
+                                }}
+                            >
+                                <option value="English">English</option>
+                                <option value="French">French</option>
+                            </select> </div>
+
+                             {/* Button to generate the final AI comment */}
                         <button
                             onClick={generateComment}
-                            className="bg-lime-700 disabled:bg-lime-400 text-sm text-white px-4 py-2 rounded mt-4 flex justify-center items-center gap-2"
-                            disabled={loading}
+                            className="bg-lime-700 disabled:bg-lime-200 text-sm text-white px-4 py-2 rounded flex justify-center items-center gap-2"
+                            disabled={gLoading}
                         >
 
-                            {loading ? (
+                            {gLoading ? (
                                 <>
                                     <svg
                                         className="w-5 h-5 animate-spin text-white"
@@ -376,20 +388,28 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                                     Generating Comment...
                                 </>
                             ) : (
-                                <span>Submit</span>
+                                <span>Generate Comment</span>
                             )}
                         </button>
+                        </div>
+
+                       
                     </div>
                 )}
 
                 {/* Show the final AI-generated comment */}
                 {generatedComment && (
-                    <div className="my-4 p-3 bg-gray-100 rounded-md">
+                    <div ref={generatedCommentRef} className="my-4 p-3 bg-gray-100 rounded-md">
                         <h3 className="font-medium">Generated Comment:</h3>
                         <p className="text-gray-700 text-sm">{generatedComment}</p>
 
-                        <button onClick={() => submitComments()} type="button" className="flex items-center justify-center gap-2 bg-black disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
-                            {sLoading ? (
+                        <div className="flex justify-between items-center">
+
+                            <button onClick={() => setSubmitComment(true)} type="button" className="flex items-center justify-center gap-2 bg-lime-600 disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
+                                Accept Comment
+                            </button>
+
+                            <button disabled={gLoading} onClick={generateComment} type="button" className="flex items-center justify-center gap-2 bg-blue-600 disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs"> {gLoading ? (
                                 <>
                                     <svg
                                         className="w-5 h-5 animate-spin text-white"
@@ -411,12 +431,45 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                                             d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
                                         ></path>
                                     </svg>
-                                    Processing...
+                                    Generating Comment...
                                 </>
                             ) : (
-                                <span>Submit Generated Comment for Approval!</span>
+                                <span>Regenerate Comment</span>
                             )}
-                        </button>
+                            </button>
+
+                            <button disabled={loading} onClick={fetchQuestions} type="button" className="flex items-center justify-center gap-2 bg-red-600 disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
+                                {loading ? (
+                                    <>
+                                        <svg
+                                            className="w-5 h-5 animate-spin text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
+                                            ></path>
+                                        </svg>
+                                        Generating Questions...
+                                    </>
+                                ) : (
+                                    <span>Regenerate Questions</span>
+                                )}
+                            </button>
+
+                        </div>
+
                     </div>
                 )}
 

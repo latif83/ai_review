@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
-import { GoogleTranslate } from "@/components/googleTranslateScript";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+// import { GoogleTranslate } from "@/components/googleTranslateScript";
+// import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -85,7 +85,7 @@ export default function RootLayout({ children }) {
           hideProgressBar={false}
           stacked
         />
-        <GoogleTranslate />
+        {/* <GoogleTranslate /> */}
         {/* <LanguageSwitcher /> */}
         {children}
       </body>

@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { SubmitComment } from "./submitComment";
 
 // OpenRouter API configuration
 const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY; // Replace this with your OpenRouter API key
@@ -13,9 +14,16 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
     const [generatedComment, setGeneratedComment] = useState("");
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        generatedComment && generatedCommentRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [generatedComment])
+
     // Function to fetch AI-generated questions
     const fetchQuestions = async () => {
         setLoading(true);
+        setQuestions([])
+        setAnswers({})
+        setGeneratedComment("")
         try {
             const response = await fetch(OPENROUTER_API_URL, {
                 method: "POST",
@@ -128,16 +136,20 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
         setAnswers((prev) => ({ ...prev, [questionIndex]: selectedOption }));
     };
 
+    const [gLoading, setGLoading] = useState(false)
+
+    const generatedCommentRef = useRef(null);
+
     // Function to generate a comment based on selected answers
     const generateComment = async () => {
-        setLoading(true);
+        setGLoading(true);
         try {
             const selectedAnswersText = Object.values(answers).join(", ");
 
             // Check if selectedAnswersText is empty
             if (!selectedAnswersText.trim()) {
                 toast.error("Please select at least one answer before proceeding.");
-                setLoading(false);
+                setGLoading(false);
                 return;
             }
 
@@ -175,6 +187,8 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 
             const data = await response.json();
 
+            // console.log(data)
+
             // ✅ Extract raw content
             let rawContent = data.choices[0]?.message?.content || "";
 
@@ -192,8 +206,9 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 
         } catch (error) {
             console.error("Error generating comment:", error);
+            toast.error("Comment not generated, please retry!")
         }
-        setLoading(false);
+        setGLoading(false);
     };
 
     const [sLoading, setSLoading] = useState(false)
@@ -227,8 +242,13 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
         }
     }
 
+    const [submitComment, setSubmitComment] = useState(false)
+
     return (
         <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
+
+            {submitComment && <SubmitComment generatedComment={generatedComment} setSubmitComment={setSubmitComment} />}
+
             <div className="max-w-4xl transition duration-1000 bg-white h-full overflow-y-auto mx-auto rounded-t-xl p-3">
                 <div className="flex justify-between items-center">
                     <h1 className="font-medium">
@@ -244,7 +264,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 
                 {/* Button to fetch AI-generated questions */}
                 {questions.length === 0 && (
-                    <div className="flex justify-center items-center p-2 mt-5">
+                    <div className="flex justify-center items-center p-2 mt-2">
                         <button
                             onClick={fetchQuestions}
                             className="bg-indigo-600 disabled:bg-indigo-300 text-white px-4 py-2 rounded mt-3 flex items-center justify-center gap-2 text-sm w-full"
@@ -347,11 +367,11 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                         {/* Button to generate the final AI comment */}
                         <button
                             onClick={generateComment}
-                            className="bg-lime-700 disabled:bg-lime-400 text-sm text-white px-4 py-2 rounded mt-4 flex justify-center items-center gap-2"
-                            disabled={loading}
+                            className="bg-lime-700 disabled:bg-lime-200 text-sm text-white px-4 py-2 rounded mt-4 flex justify-center items-center gap-2"
+                            disabled={gLoading}
                         >
 
-                            {loading ? (
+                            {gLoading ? (
                                 <>
                                     <svg
                                         className="w-5 h-5 animate-spin text-white"
@@ -376,7 +396,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                                     Generating Comment...
                                 </>
                             ) : (
-                                <span>Submit</span>
+                                <span>Generate Comment</span>
                             )}
                         </button>
                     </div>
@@ -384,12 +404,17 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
 
                 {/* Show the final AI-generated comment */}
                 {generatedComment && (
-                    <div className="my-4 p-3 bg-gray-100 rounded-md">
+                    <div ref={generatedCommentRef} className="my-4 p-3 bg-gray-100 rounded-md">
                         <h3 className="font-medium">Generated Comment:</h3>
                         <p className="text-gray-700 text-sm">{generatedComment}</p>
 
-                        <button onClick={() => submitComments()} type="button" className="flex items-center justify-center gap-2 bg-black disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
-                            {sLoading ? (
+                        <div className="flex justify-between items-center">
+
+                            <button onClick={() => setSubmitComment(true)} type="button" className="flex items-center justify-center gap-2 bg-lime-600 disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
+                                Accept Comment
+                            </button>
+
+                            <button disabled={gLoading} onClick={generateComment} type="button" className="flex items-center justify-center gap-2 bg-blue-600 disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs"> {gLoading ? (
                                 <>
                                     <svg
                                         className="w-5 h-5 animate-spin text-white"
@@ -411,12 +436,45 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
                                             d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
                                         ></path>
                                     </svg>
-                                    Processing...
+                                    Generating Comment...
                                 </>
                             ) : (
-                                <span>Submit Generated Comment for Approval!</span>
+                                <span>Regenerate Comment</span>
                             )}
-                        </button>
+                            </button>
+
+                            <button disabled={loading} onClick={fetchQuestions} type="button" className="flex items-center justify-center gap-2 bg-red-600 disabled:bg-gray-700 text-white p-2 rounded-md mt-2 text-xs">
+                                {loading ? (
+                                    <>
+                                        <svg
+                                            className="w-5 h-5 animate-spin text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                            ></circle>
+                                            <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"
+                                            ></path>
+                                        </svg>
+                                        Generating Questions...
+                                    </>
+                                ) : (
+                                    <span>Regenerate Questions</span>
+                                )}
+                            </button>
+
+                        </div>
+
                     </div>
                 )}
 

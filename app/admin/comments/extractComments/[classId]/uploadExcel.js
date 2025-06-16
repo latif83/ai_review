@@ -57,13 +57,13 @@ const supportedLanguages = [
               );
       
               let comment = student?.comment || "";
-              if (comment && targetLang !== "en") {
-                try {
-                  comment = await translateText(comment, targetLang);
-                } catch (err) {
-                  console.error("Translation error:", err);
-                }
-              }
+              // if (comment && targetLang !== "en") {
+              //   try {
+              //     comment = await translateText(comment, targetLang);
+              //   } catch (err) {
+              //     console.error("Translation error:", err);
+              //   }
+              // }
       
               return { ...row, "TEACHERS COMMENT": comment };
             })
@@ -91,6 +91,7 @@ const supportedLanguages = [
           document.body.removeChild(a);
       
           toast.success("Excel file updated and downloaded!");
+          setUpload(false);
           setLoading(false);
         };
       
@@ -167,32 +168,6 @@ const supportedLanguages = [
               onChange={handleFileChange}
             />
           </div>
-
-          <div className="text-sm mt-4">
-  <label>
-    <input
-      type="checkbox"
-      checked={translate}
-      onChange={() => setTranslate(!translate)}
-      className="mr-2"
-    />
-    Translate comments
-  </label>
-
-  {translate && (
-    <select
-      value={language}
-      onChange={(e) => setLanguage(e.target.value)}
-      className="block mt-2 p-2 border rounded-md"
-    >
-      {supportedLanguages.map((lang) => (
-        <option key={lang.code} value={lang.code}>
-          {lang.label}
-        </option>
-      ))}
-    </select>
-  )}
-</div>
 
 
           <div className="flex justify-end pt-6">
