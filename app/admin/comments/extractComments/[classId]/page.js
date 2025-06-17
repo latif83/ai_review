@@ -13,6 +13,7 @@ export default function StudentsClassCommentDetails({ params }) {
   const [commentData, setCommentData] = useState([]);
 
   const [className, setClassName] = useState("");
+  const [subjectBasedComments,setSubjectBasedComments] = useState(false);
 
   const [fileUploaded, setFileUploaded] = useState(false);
 
@@ -34,8 +35,10 @@ export default function StudentsClassCommentDetails({ params }) {
         return;
       }
 
-      setCommentData(responseData.students);
+      setCommentData(responseData.students); 
       setClassName(responseData.className);
+      setSubjectBasedComments(responseData.subjectBasedComments);
+
       setFileUploaded(responseData.fileUploaded);
     } catch (e) {
       console.log(e);
@@ -90,6 +93,7 @@ export default function StudentsClassCommentDetails({ params }) {
           setUpload={setUpload}
           studentsComments={commentData}
           className={className}
+          subjectBasedComments={subjectBasedComments}
         />
       )}
 

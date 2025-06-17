@@ -31,6 +31,8 @@ export async function GET(req, { params }) {
       },
     });
 
+    // console.log({ classDetails });
+
     // Fetch students belonging to the given class
     const students = await prisma.students.findMany({
       where: { classId },
@@ -56,7 +58,7 @@ export async function GET(req, { params }) {
           in: studentIds,
         }, // Fetch comments where studentId matches
       },
-      select: { id:true,studentId: true, comment: true, ApprovedBy: true },
+      select: { id:true,studentId: true, comment: true, fComment:true, ApprovedBy: true },
     });
 
     const checkExcelFileUpload = await prisma.UploadExcel.findMany({
@@ -77,6 +79,9 @@ export async function GET(req, { params }) {
       comment:
         comments.find((comment) => comment.studentId === student.studentId)
           ?.comment || null, // Get the comment or null if not found
+          fComment:
+        comments.find((comment) => comment.studentId === student.studentId)
+          ?.fComment || null,
       ApprovedBy:
         comments.find((comment) => comment.studentId === student.studentId)
           ?.ApprovedBy || null,
@@ -88,6 +93,7 @@ export async function GET(req, { params }) {
       {
         students: studentsWithComments,
         className: classDetails.className,
+        subjectBasedComments : classDetails.subjectBasedComments,
         fileUploaded,
       },
       { status: 200 }

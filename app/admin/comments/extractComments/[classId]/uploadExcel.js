@@ -5,7 +5,12 @@ import { toast } from "react-toastify";
 import { v4 } from "uuid";
 import * as XLSX from "xlsx";
 
-export const UploadExcel = ({ setUpload,studentsComments,className }) => {
+export const UploadExcel = ({
+  setUpload,
+  studentsComments,
+  className,
+  subjectBasedComments,
+}) => {
   const [loading, setLoading] = useState(false);
 
   const [file, setFile] = useState(null);
@@ -13,19 +18,6 @@ export const UploadExcel = ({ setUpload,studentsComments,className }) => {
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
-
-  const [translate, setTranslate] = useState(false);
-const [language, setLanguage] = useState("fr"); // default to French
-
-const supportedLanguages = [
-  { code: "fr", label: "French" },
-  { code: "es", label: "Spanish" },
-  { code: "de", label: "German" },
-  { code: "pt", label: "Portuguese" },
-  { code: "zh", label: "Chinese" },
-  { code: "ar", label: "Arabic" },
-];
-
 
   const processExcelFile = async (e) => {
     e.preventDefault();
@@ -43,20 +35,35 @@ const supportedLanguages = [
         const handleData = async () => {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: "array" });
-      
+
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-      
+
           let excelData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-      
+
           // Translate and update comments
           excelData = await Promise.all(
             excelData.map(async (row) => {
               const student = studentsComments.find(
                 (s) => s.studentId === row["STUDENT ID"]
               );
-      
-              let comment = student?.comment || "";
+
+              let comment;
+              let fComment;
+
+              if (subjectBasedComments) {
+                comment = student?.comment || "";
+                return { ...row, "TEACHERS COMMENT": comment };
+              } else {
+                comment = student?.comment || "";
+                fComment = student?.fComment || "";
+                return {
+                  ...row,
+                  "ENGLISH TEACHER`S COMMENT ": comment,
+                  "FRENCH TEACHER`S COMMENT ": fComment,
+                };
+              }
+
               // if (comment && targetLang !== "en") {
               //   try {
               //     comment = await translateText(comment, targetLang);
@@ -64,24 +71,26 @@ const supportedLanguages = [
               //     console.error("Translation error:", err);
               //   }
               // }
-      
-              return { ...row, "TEACHERS COMMENT": comment };
             })
           );
-      
+
           const updatedSheet = XLSX.utils.json_to_sheet(excelData);
           const updatedWorkbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(updatedWorkbook, updatedSheet, sheetName);
-      
+          XLSX.utils.book_append_sheet(
+            updatedWorkbook,
+            updatedSheet,
+            sheetName
+          );
+
           const excelBuffer = XLSX.write(updatedWorkbook, {
             bookType: "xlsx",
             type: "array",
           });
-      
+
           const blob = new Blob([excelBuffer], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           });
-      
+
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -89,15 +98,14 @@ const supportedLanguages = [
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-      
+
           toast.success("Excel file updated and downloaded!");
           setUpload(false);
           setLoading(false);
         };
-      
+
         handleData();
       };
-      
 
       reader.readAsArrayBuffer(file);
     } catch (error) {
@@ -120,7 +128,7 @@ const supportedLanguages = [
           format: "text",
         }),
       });
-  
+
       const data = await res.json();
       return data.translatedText || text;
     } catch (error) {
@@ -129,7 +137,6 @@ const supportedLanguages = [
     }
   };
 
-  
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
       <div className="max-w-2xl relative transition duration-1000 bg-white h-full mx-auto rounded-t-xl p-3">
@@ -168,7 +175,6 @@ const supportedLanguages = [
               onChange={handleFileChange}
             />
           </div>
-
 
           <div className="flex justify-end pt-6">
             <button

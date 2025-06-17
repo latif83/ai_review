@@ -84,6 +84,7 @@ export default function StudentsClassCommentDetails({ params }) {
           setUpload={setUpload}
           studentsComments={commentData}
           className={className}
+          subjectBasedComments={true}
         />
       )}
 
