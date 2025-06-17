@@ -1,37 +1,73 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { toast } from "react-toastify";
 
-export const SubmitComment = ({ generatedComment, setSubmitComment }) => {
+export const SubmitComment = ({ generatedComment, setSubmitComment, targetLanguage,studentId,teacherName,setFetchData,setNewComment }) => {
 
     const [sLoading, setSLoading] = useState(false)
 
-    //  const submitComments = async () => {
-    //         try {
+    const [academicYr, setAcademicYr] = useState("");
+    const [academicTerm, setAcademicTerm] = useState("");
 
-    //             setSLoading(true)
-    //             const response = await fetch(`/api/students/${studentId}/comments`, {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                 },
-    //                 body: JSON.stringify({ studentId, comment: generatedComment, by: teacherName }),
-    //             })
+    const [acdemicDataLoading, setAcademicDataLoading] = useState(true);
+    const [academicData, setAcademicData] = useState();
 
-    //             const responseData = await response.json()
-    //             if (!response.ok) {
-    //                 toast.error(responseData.message)
-    //                 return
-    //             }
+    useEffect(() => {
 
-    //             toast.success(responseData.message)
-    //             setFetchData(true)
-    //             setNewComment(false)
-    //         }
-    //         catch (e) {
-    //             console.log(e)
-    //         } finally {
-    //             setSLoading(false)
-    //         }
-    //     }
+        const getAcademicData = async () => {
+            setAcademicDataLoading(true);
+            try {
+                const response = await fetch(`/api/calendar`);
+
+                const responseData = await response.json();
+
+                if (!response.ok) {
+                    toast.error(responseData.message || "Unexpected error happened, please try again later!");
+                    return;
+                }
+
+                setAcademicData(responseData.academicYrs);
+
+            } catch (e) {
+                console.log(e);
+                toast.error("Internal server error!");
+            } finally {
+                setAcademicDataLoading(false);
+            }
+        };
+
+        getAcademicData();
+
+    }, [])
+
+    const submitComments = async () => {
+        try {
+
+            setSLoading(true)
+            const response = await fetch(`/api/students/${studentId}/comments`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ studentId, comment: generatedComment, by: teacherName, targetLanguage,academicTerm, academicYr }),
+            })
+
+            const responseData = await response.json()
+            if (!response.ok) {
+                toast.error(responseData.message)
+                return
+            }
+
+            toast.success(responseData.message)
+            setFetchData(true)
+            setNewComment(false)
+        }
+        catch (e) {
+            console.log(e)
+            toast.error("Internal Server Error!")
+        } finally {
+            setSLoading(false)
+        }
+    }
 
     return (
         <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">
@@ -62,22 +98,22 @@ export const SubmitComment = ({ generatedComment, setSubmitComment }) => {
                                 id="academicYr"
                                 name="academicYr"
                                 className="p-2 border w-full rounded-md text-sm mt-1"
-                            //   value={academicYr}
-                            //   onChange={(e) => {
-                            //     setAcademicYr(e.target.value);
-                            //     setAcademicTerm("");
-                            //   }}
+                                value={academicYr}
+                                onChange={(e) => {
+                                    setAcademicYr(e.target.value);
+                                    setAcademicTerm("");
+                                }}
                             >
                                 <option value="">Select Academic Year</option>
-                                {/* {acdemicDataLoading ? (
-                    <option value="">Loading...</option>
-                  ) : (
-                    academicData.map((year) => (
-                      <option key={year.id} value={year.year}>
-                        {year.year}
-                      </option>
-                    ))
-                  )} */}
+                                {acdemicDataLoading ? (
+                                    <option value="">Loading...</option>
+                                ) : (
+                                    academicData.map((year) => (
+                                        <option key={year.id} value={year.year}>
+                                            {year.year}
+                                        </option>
+                                    ))
+                                )}
                             </select>
                         </div>
 
@@ -89,23 +125,23 @@ export const SubmitComment = ({ generatedComment, setSubmitComment }) => {
                                 id="academicTerm"
                                 name="academicTerm"
                                 className="p-2 border w-full rounded-md text-sm mt-1"
-                            //   value={academicTerm}
-                            //   onChange={(e) => setAcademicTerm(e.target.value)}
+                                value={academicTerm}
+                                onChange={(e) => setAcademicTerm(e.target.value)}
                             >
                                 <option value="">Select Academic Term</option>
-                                {/* {acdemicDataLoading ? (
-                    <option value="">Loading...</option>
-                  ) : (
-                    academicData.map((year) => {
-                      if (year.year === academicYr) {
-                        return year.terms.map((term) => (
-                          <option key={term.id} value={term.term}>
-                            {term.term}
-                          </option>
-                        ));
-                      }
-                    })
-                  )} */}
+                                {acdemicDataLoading ? (
+                                    <option value="">Loading...</option>
+                                ) : (
+                                    academicData.map((year) => {
+                                        if (year.year === academicYr) {
+                                            return year.terms.map((term) => (
+                                                <option key={term.id} value={term.term}>
+                                                    {term.term}
+                                                </option>
+                                            ));
+                                        }
+                                    })
+                                )}
                             </select>
                         </div>
                     </div>

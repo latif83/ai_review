@@ -8,10 +8,9 @@ import { toast } from "react-toastify";
 
 export const dynamic = "force-dynamic";
 
-
 export async function GET(req, { params }) {
   try {
-    const { studentId } =  await params;
+    const { studentId } = await params;
 
     // Convert studentId to integer
     const studentIdInt = parseInt(studentId);
@@ -28,10 +27,7 @@ export async function GET(req, { params }) {
     });
 
     if (!student) {
-      return NextResponse.json(
-        { error: "Student not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Student not found" }, { status: 404 });
     }
 
     // Fetch previous comments for the student
@@ -40,10 +36,7 @@ export async function GET(req, { params }) {
       orderBy: { createdAt: "desc" }, // Sort by latest academic year
     });
 
-    return NextResponse.json(
-      { student, comments },
-      { status: 200 }
-    );
+    return NextResponse.json({ student, comments }, { status: 200 });
   } catch (error) {
     console.error("Error fetching student and comments:", error);
     return NextResponse.json(
@@ -53,97 +46,143 @@ export async function GET(req, { params }) {
   }
 }
 
-export async function POST(req,{params}){
-    try{
-        // extract body params
-        const {comment,by} = await req.json()
+export async function POST(req, { params }) {
+  try {
+    // extract body params
+    const { comment, by, academicTerm, academicYr, targetLanguage } =
+      await req.json();
 
-        // console.log({comment,by})
+    // console.log({comment,by})
 
-        const {studentId} = await params
+    const { studentId } = await params;
 
-        const student = await prisma.students.findUnique({
-            where : {
-                id : parseInt(studentId)
-            }
-        })
+    console.log({
+      comment,
+      by,
+      academicTerm,
+      academicYr,
+      targetLanguage,
+      studentId,
+    });
 
-        if(!comment){
+    const student = await prisma.students.findUnique({
+      where: {
+        id: parseInt(studentId),
+      },
+    });
 
-            return NextResponse.json(
-                { message: "Please provide the required params." },
-                { status: 400 }
-              );
-        }
+    const commentKey = targetLanguage === "English" ? "comment" : "fComment";
 
-        const createComment = await prisma.Comments.create({
-            data : {
-                academicYr : "2024/2025",
-                academicTerm : "Term 2",
-                comment,
-                studentId : student.studentId,
-                by
-            }
-        })
+    console.log([commentKey]);
 
-        if(!createComment){
-            return NextResponse.json(
-                { message: "Unexpected error while creating comment, please try again later." },
-                { status: 400 }
-              );
-        }
-
-        return NextResponse.json(
-            { message: "Comment created successful!" },
-            { status: 200 }
-          );
-
-    }catch(e){
-        console.log(e)
-        toast.error("Internal Server Error!")
+    if (!comment) {
+      return NextResponse.json(
+        { message: "Please provide the required params." },
+        { status: 400 }
+      );
     }
+
+    const existingComment = await prisma.Comments.findFirst({
+      where: {
+        academicYr,
+        academicTerm,
+        studentId: student.studentId,
+      },
+    });
+
+    if (existingComment) {
+      // update comment
+      if (targetLanguage === "English" && existingComment.comment && existingComment.comment !== "N/A") {
+        return NextResponse.json(
+          { message: "Comment already exists for this student in English." },
+          { status: 400 }
+        );
+      } else if (targetLanguage === "French" && existingComment.fComment) {
+        return NextResponse.json(
+          { message: "Comment already exists for this student in French." },
+          { status: 400 }
+        );
+      }
+
+      await prisma.Comments.update({
+        where: { id: existingComment.id },
+        data: {
+          [commentKey]: comment,
+          by,
+        },
+      });
+
+    } else {
+      targetLanguage === "English" ? await prisma.Comments.create({
+        data: {
+          academicYr,
+          academicTerm,
+          comment,
+          studentId: student.studentId,
+          by,
+        },
+      }) : await prisma.Comments.create({
+        data: {
+          academicYr,
+          academicTerm,
+          comment : 'N/A',
+          fComment: comment,
+          studentId: student.studentId,
+          by,
+        },
+      })
+    }
+
+    return NextResponse.json(
+      { message: "Comment created successful!" },
+      { status: 200 }
+    );
+  } catch (e) {
+    console.log(e);
+    toast.error("Internal Server Error!");
+  }
 }
 
 export async function PUT(req) {
   try {
-      // Extract body params
-      const { approvedBy,commentId } = await req.json();
-      // const { commentId } = params;
+    // Extract body params
+    const { approvedBy, commentId } = await req.json();
+    // const { commentId } = params;
 
-      console.log({ approvedBy,commentId })
+    console.log({ approvedBy, commentId });
 
-      if (!approvedBy) {
-          return NextResponse.json(
-              { message: "Please provide the approvedBy field." },
-              { status: 400 }
-          );
-      }
-
-      const updateComment = await prisma.Comments.update({
-          where: {
-              id: commentId,
-          },
-          data: {
-            ApprovedBy:approvedBy,
-          },
-      });
-
-      if (!updateComment) {
-          return NextResponse.json(
-              { message: "Error updating comment approval, please try again later." },
-              { status: 400 }
-          );
-      }
-
+    if (!approvedBy) {
       return NextResponse.json(
-          { message: "Comment approved successfully!" },
-          { status: 200 }
+        { message: "Please provide the approvedBy field." },
+        { status: 400 }
       );
+    }
+
+    const updateComment = await prisma.Comments.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        ApprovedBy: approvedBy,
+      },
+    });
+
+    if (!updateComment) {
+      return NextResponse.json(
+        { message: "Error updating comment approval, please try again later." },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Comment approved successfully!" },
+      { status: 200 }
+    );
   } catch (e) {
-      console.log(e);
-      return NextResponse.json(
-          { message: "Internal Server Error!" },
-          { status: 500 }
-      );
+    console.log(e);
+    return NextResponse.json(
+      { message: "Internal Server Error!" },
+      { status: 500 }
+    );
   }
 }

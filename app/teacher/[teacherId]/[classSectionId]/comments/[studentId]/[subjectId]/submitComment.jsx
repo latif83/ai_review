@@ -11,17 +11,6 @@ export const SubmitComment = ({ generatedComment, setSubmitComment, studentId, t
     const [acdemicDataLoading, setAcademicDataLoading] = useState(true);
     const [academicData, setAcademicData] = useState();
 
-     // New state for translated comment and translation loading
-    const [translatedComment, setTranslatedComment] = useState(generatedComment);
-    const [isTranslating, setIsTranslating] = useState(false);
-    const [targetLanguage, setTargetLanguage] = useState(""); // e.g., 'fr', 'es', 'de'
-
-    // Languages options for the dropdown (simplified for example)
-    const languages = [
-        { code: "en", name: "English" },
-        { code: "fr", name: "French" }
-    ];
-
     useEffect(() => {
 
         const getAcademicData = async () => {
@@ -49,49 +38,6 @@ export const SubmitComment = ({ generatedComment, setSubmitComment, studentId, t
         getAcademicData();
 
     }, [])
-
-    // New function to handle translation
-    const handleTranslateComment = async (langCode) => {
-        if (!langCode || langCode === "en") { // If English or no language selected, show original
-            setTranslatedComment(generatedComment);
-            setTargetLanguage("en"); // Set to English
-            return;
-        }
-
-        setIsTranslating(true);
-        try {
-            // Call your backend proxy endpoint
-            const response = await fetch(TRANSLATE_API_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text: generatedComment,
-                    targetLanguage: langCode,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                toast.error(data.message || "Translation failed.");
-                setTranslatedComment(generatedComment); // Fallback to original
-                setTargetLanguage(""); // Clear selection on error
-                return;
-            }
-
-            setTranslatedComment(data.translatedText);
-            toast.success(`Comment translated to ${languages.find(l => l.code === langCode)?.name || langCode}!`);
-        } catch (error) {
-            console.error("Error during translation:", error);
-            toast.error("Failed to translate comment. Please try again.");
-            setTranslatedComment(generatedComment); // Fallback to original
-            setTargetLanguage(""); // Clear selection on error
-        } finally {
-            setIsTranslating(false);
-        }
-    };
 
 
     const submitComments = async () => {

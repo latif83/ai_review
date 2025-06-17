@@ -82,6 +82,7 @@ model Comments {
   academicYr   String?
   academicTerm String?
   comment      String
+  fComment String?
   by           String?
   ApprovedBy   String?
   subjectId     String?        // optional relation to Subject
