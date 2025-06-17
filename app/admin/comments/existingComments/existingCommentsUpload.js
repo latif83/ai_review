@@ -33,10 +33,9 @@ export const ExistingCommentsUpload = ({
       }
     };
 
-    if(classInfo.subjectBasedComments){
-    getSubjects();
+    if (classInfo.subjectBasedComments) {
+      getSubjects();
     }
-    
   }, [classInfo]);
 
   const [file, setFile] = useState(null);
@@ -65,16 +64,32 @@ export const ExistingCommentsUpload = ({
       // Convert sheet data to JSON
       const rawData = XLSX.utils.sheet_to_json(sheet);
 
-      const formattedData = rawData.map((row) => ({
-        academicYr: academicYr, // Adjust column names
-        academicTerm: academicTerm,
-        comment: row["ENGLISH TEACHER`S COMMENT "] || row["FRENCH TEACHER`S COMMENT "] || row["TEACHERS COMMENT"],
-        studentId: row["STUDENT ID"]
-      }));
+      let formattedData;
+
+      if (classInfo.subjectBasedComments) {
+        formattedData = rawData.map((row) => ({
+          academicYr: academicYr, // Adjust column names
+          academicTerm: academicTerm,
+          comment: row["TEACHERS COMMENT"],
+          studentId: row["STUDENT ID"],
+        }));
+      } else {
+        formattedData = rawData.map((row) => ({
+          academicYr: academicYr, // Adjust column names
+          academicTerm: academicTerm,
+          comment: row["ENGLISH TEACHER`S COMMENT "] || 'N/A',
+          fComment: row["FRENCH TEACHER`S COMMENT "],
+          studentId: row["STUDENT ID"],
+        }));
+      }
 
       // console.log("Formatted Data:", formattedData);
 
-      setExtractedData({ comments: formattedData, classId: classInfo.id });
+      setExtractedData({
+        comments: formattedData,
+        classId: classInfo.id,
+        subjectBasedComments: classInfo.subjectBasedComments,
+      });
     };
   };
 
@@ -110,14 +125,13 @@ export const ExistingCommentsUpload = ({
     }
   };
 
-  const [academicYr,setAcademicYr] = useState("");
-  const [academicTerm,setAcademicTerm] = useState("");
+  const [academicYr, setAcademicYr] = useState("");
+  const [academicTerm, setAcademicTerm] = useState("");
 
-  const [acdemicDataLoading,setAcademicDataLoading] = useState(true);
-  const [academicData,setAcademicData] = useState();
+  const [acdemicDataLoading, setAcademicDataLoading] = useState(true);
+  const [academicData, setAcademicData] = useState();
 
-  useEffect(()=>{
-
+  useEffect(() => {
     const getAcademicData = async () => {
       setAcademicDataLoading(true);
       try {
@@ -126,12 +140,14 @@ export const ExistingCommentsUpload = ({
         const responseData = await response.json();
 
         if (!response.ok) {
-          toast.error(responseData.message || "Unexpected error happened, please try again later!");
+          toast.error(
+            responseData.message ||
+              "Unexpected error happened, please try again later!"
+          );
           return;
         }
 
         setAcademicData(responseData.academicYrs);
-
       } catch (e) {
         console.log(e);
         toast.error("Internal server error!");
@@ -141,8 +157,7 @@ export const ExistingCommentsUpload = ({
     };
 
     getAcademicData();
-
-  },[])
+  }, []);
 
   return (
     <div className="fixed top-0 left-0 w-full h-svh bg-black/20 backdrop-blur-sm pt-10 z-40">

@@ -11,7 +11,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const { subjectId, classId } = body;
+    const { subjectId, classId, subjectBasedComments } = body;
 
     // console.log({ subjectId, classId })
 
@@ -63,13 +63,24 @@ export async function POST(req) {
           continue;
         }
 
-        newComments.push({
-          studentId: comment.studentId,
-          academicYr: comment.academicYr,
-          academicTerm: comment.academicTerm,
-          comment: comment.comment, // Allow different comments for the same student, term, and year
-          subjectId: subjectId,
-        });
+        if (subjectBasedComments) {
+          newComments.push({
+            studentId: comment.studentId,
+            academicYr: comment.academicYr,
+            academicTerm: comment.academicTerm,
+            comment: comment.comment, // Allow different comments for the same student, term, and year
+            subjectId: subjectId,
+          });
+        } else {
+          newComments.push({
+            studentId: comment.studentId,
+            academicYr: comment.academicYr,
+            academicTerm: comment.academicTerm,
+            comment: comment.comment, // Allow different comments for the same student, term, and year
+            fComment: comment.fComment, // Assuming fComment is a field in the comment object
+            subjectId: subjectId,
+          });
+        }
       }
     }
 

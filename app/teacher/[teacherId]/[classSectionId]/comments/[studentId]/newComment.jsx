@@ -75,7 +75,7 @@ export const NewComment = ({ previousComments, studentName, setNewComment, stude
             });
 
             const data = await response.json();
-            console.log(data)
+            // console.log(data)
             // console.log("Raw Response:", data.choices[0].message.content);
 
             try {
